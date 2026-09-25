@@ -27,6 +27,10 @@ dependencies = [
 
 [project.scripts]
 tasker-mcp = "tasker_mcp.__main__:main"
+tasker-mcp-build-index = "tasker_mcp.indexer.build_db:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tasker_mcp"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/tasker_mcp/indexer/data/Tasker_XML_Codes.md" = "tasker_mcp/indexer/data/Tasker_XML_Codes.md"

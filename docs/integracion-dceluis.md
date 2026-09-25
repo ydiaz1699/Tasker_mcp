@@ -4,9 +4,10 @@ Este documento explica cómo **este repo (Tasker_mcp, Python)** y el MCP externo
 [`dceluis/tasker-mcp`](https://github.com/dceluis/tasker-mcp) (Go) se complementan,
 y —lo más importante— **cómo el LLM genera automatizaciones de Tasker sin equivocarse**.
 
-> No construimos un indexador tipo `n8n-mcp`. No hace falta: el conocimiento de
-> Tasker ya está embebido en `src/tasker_mcp/knowledge/` y se valida en
-> `validate_tasker_xml`. Este documento describe ese mecanismo y cómo enchufar la
+> Adoptamos el mecanismo de `n8n-mcp` (SOURCE → LOADER → PARSER → DB SQLite/FTS5 →
+> tools de búsqueda) porque Tasker, al no tener nodos visuales, necesita un índice
+> consultable de acciones/eventos/estados para que el LLM no invente códigos. Este
+> documento describe ese índice, la validación que lo respalda, y cómo enchufar la
 > ejecución en vivo por encima.
 
 ---
@@ -60,23 +61,31 @@ Estructura de los archivos:
 El riesgo real: si el LLM **inventa un código, un argumento o un valor**, Tasker
 rechaza el import o hace algo inesperado. Aquí están las capas que lo evitan.
 
-### 2.2. Capa 1 — Conocimiento real, no memoria
+### 2.2. Capa 1 — Índice consultable (patrón n8n-mcp), no memoria
 
-`src/tasker_mcp/knowledge/*.py` contiene datos extraídos de **Tasker v5.15.5-beta**
-(fuente: [Taskomater/Tasker-XML-Info](https://github.com/Taskomater/Tasker-XML-Info)):
+Igual que n8n-mcp indexa sus ~525 nodos para que el LLM los conozca, este repo indexa
+las acciones/eventos/estados de Tasker. Pipeline: **SOURCE → LOADER → PARSER → DB
+(SQLite + FTS5) → tools de búsqueda** (`src/tasker_mcp/indexer/`).
 
-- `actions.py` — 373 códigos con `code, name, category, description, args`
-- `events.py` — 82 eventos · `states.py` — 50 estados · `variables.py` — 99 variables
-- `patterns.py` — 10 patrones probados (battery_saver, silent_at_work, …)
+- **SOURCE autoritativa:** [Taskomater/Tasker-XML-Info](https://github.com/Taskomater/Tasker-XML-Info)
+  → `code → name → kind` de 373 acciones, 82 eventos, 50 estados. Vendorizada en
+  `indexer/data/Tasker_XML_Codes.md` (build offline) y re-descargable con `--refresh`.
+- **ENRICHMENT:** `knowledge/*.py` añade descripciones, args y las 99 variables/patterns
+  que la fuente no trae.
+- **DB:** `build_db.py` fusiona ambos en `tasker_index.db` (SQLite + **FTS5**, ranking BM25).
+- Las `search_tasker_*` consultan ese índice. Si falta la DB, **fallback** a la búsqueda
+  en memoria; y el server la **auto-construye** en el primer arranque.
 
 El LLM **consulta**, no adivina:
 
 ```
-search_tasker_actions("wifi")
-→ {"code": 425, "name": "WiFi", "category": "Net", "args": ["Set"]}
+search_tasker_actions("wifi")   →   busca en el índice FTS5, devuelve los códigos
+                                     reales rankeados por relevancia (BM25)
 ```
 
-Toma el `425` de la base, no de su memoria. Igual para eventos, estados y variables.
+Ventaja del LOADER frente a mantener los datos a mano: la lista de códigos deja de
+tipearse (antes había ~90 acciones a mano; ahora están las 373 de la fuente), y se
+re-indexa con un comando cuando Tasker publique una versión nueva.
 
 ### 2.3. Capa 2 — Validación antes de entregar
 

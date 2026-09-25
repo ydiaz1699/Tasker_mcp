@@ -39,6 +39,7 @@ from tasker_mcp.xml_engine.models import (
     TaskerTask,
 )
 from tasker_mcp import live
+from tasker_mcp.indexer import search as index_search
 
 mcp = FastMCP(
     name="Tasker MCP Server",
@@ -74,6 +75,22 @@ def search_tasker_actions(query: str, category: Optional[str] = None) -> str:
     Returns:
         JSON list of matching actions with code, name, category, description, args.
     """
+    if index_search.index_exists():
+        nodes = index_search.search_nodes(query, kind="action", category=category)
+        return json.dumps(
+            [
+                {
+                    "code": n["code"],
+                    "name": n["name"],
+                    "category": n["category"],
+                    "description": n["description"],
+                    "args": n["args"],
+                }
+                for n in nodes
+            ],
+            indent=2,
+        )
+    # Fallback: in-memory knowledge base (index not built yet).
     results = search_actions(query, category)
     return json.dumps(
         [
@@ -103,6 +120,21 @@ def search_tasker_events(query: str, category: Optional[str] = None) -> str:
     Returns:
         JSON list of matching events with code, name, category, description, args.
     """
+    if index_search.index_exists():
+        nodes = index_search.search_nodes(query, kind="event", category=category)
+        return json.dumps(
+            [
+                {
+                    "code": n["code"],
+                    "name": n["name"],
+                    "category": n["category"],
+                    "description": n["description"],
+                    "args": n["args"],
+                }
+                for n in nodes
+            ],
+            indent=2,
+        )
     results = search_events(query, category)
     return json.dumps(
         [
@@ -131,6 +163,21 @@ def search_tasker_states(query: str, category: Optional[str] = None) -> str:
     Returns:
         JSON list of matching states with code, name, category, description, args.
     """
+    if index_search.index_exists():
+        nodes = index_search.search_nodes(query, kind="state", category=category)
+        return json.dumps(
+            [
+                {
+                    "code": n["code"],
+                    "name": n["name"],
+                    "category": n["category"],
+                    "description": n["description"],
+                    "args": n["args"],
+                }
+                for n in nodes
+            ],
+            indent=2,
+        )
     results = search_states(query, category)
     return json.dumps(
         [
@@ -160,6 +207,9 @@ def search_tasker_variables(query: str, category: Optional[str] = None) -> str:
     Returns:
         JSON list of matching variables with name, description, category.
     """
+    if index_search.index_exists():
+        vars_ = index_search.search_variables(query, category)
+        return json.dumps(vars_, indent=2)
     results = search_variables(query, category)
     return json.dumps(
         [
@@ -741,8 +791,25 @@ def resource_variables() -> str:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
+def _ensure_index() -> None:
+    """Build the SQLite+FTS5 index on first run if it is missing.
+
+    Uses the vendored source (offline, no network). If the build fails for any
+    reason, the server still works via the in-memory knowledge-base fallback.
+    """
+    if index_search.index_exists():
+        return
+    try:
+        from tasker_mcp.indexer.build_db import build_database
+
+        build_database(refresh=False)
+    except Exception:  # noqa: BLE001 - fallback to in-memory search
+        pass
+
+
 def main():
     """Run the Tasker MCP Server."""
+    _ensure_index()
     mcp.run()
 
 
