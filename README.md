@@ -126,7 +126,7 @@ xml = (
 agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 ```
 
-## Tools (13)
+## Tools (14)
 
 | Tool | Description |
 |------|-------------|
@@ -143,6 +143,13 @@ agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 | `list_action_categories` | List all 18 action categories with counts |
 | `list_common_patterns` | List 10 pre-built automation patterns |
 | `get_pattern_details` | Get full details of a specific pattern |
+| `run_tasker_task` | (Optional, opt-in) Trigger an existing Tasker task live on the phone via `POST /run_task`. Needs `TASKER_HOST`/`TASKER_API_KEY`. |
+
+> **Diseñar vs ejecutar:** las tools `search_*`/`generate_*`/`validate_*` diseñan y
+> generan XML **offline** (no tocan el teléfono). `run_tasker_task` **ejecuta en vivo**
+> una tarea ya existente en el móvil y es opcional (desactivada si no configuras las
+> env vars). Cómo el LLM evita errores de códigos/argumentos y cómo se integra con el
+> MCP externo `dceluis/tasker-mcp`: ver [`docs/integracion-dceluis.md`](docs/integracion-dceluis.md).
 
 ## Resources (4)
 

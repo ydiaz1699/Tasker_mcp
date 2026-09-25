@@ -38,13 +38,18 @@ from tasker_mcp.xml_engine.models import (
     TaskerProject,
     TaskerTask,
 )
+from tasker_mcp import live
 
 mcp = FastMCP(
     name="Tasker MCP Server",
     instructions=(
         "Generate valid Tasker XML automation configurations for Android. "
         "Search 373 action codes, 82 events, 50 states, and built-in variables. "
-        "Build tasks, profiles, and projects importable directly into Tasker."
+        "Build tasks, profiles, and projects importable directly into Tasker. "
+        "ALWAYS look up codes with the search_* tools (never invent them) and "
+        "validate output with validate_tasker_xml before returning it. "
+        "Optionally, if TASKER_HOST/TASKER_API_KEY are set, run_tasker_task can "
+        "trigger an existing task on the phone in real time."
     ),
 )
 
@@ -641,6 +646,45 @@ def get_pattern_details(pattern_name: str) -> str:
         },
         indent=2,
     )
+
+
+@mcp.tool
+def run_tasker_task(task_name: str, arguments_json: Optional[str] = None) -> str:
+    """Trigger a task that ALREADY EXISTS in Tasker on the phone (live execution).
+
+    This is optional and OFF by default. It only works if the environment variables
+    TASKER_HOST and TASKER_API_KEY are set (and optionally TASKER_PORT, default 1821).
+    It sends POST http://<host>:<port>/run_task to Tasker's HTTP server.
+
+    Use this to EXECUTE an automation in real time. To DESIGN/GENERATE a new
+    automation as importable XML, use generate_task_xml / generate_profile_xml /
+    generate_project_xml instead (those work offline and don't need the phone).
+
+    Args:
+        task_name: Exact Tasker task name as it appears on the phone.
+        arguments_json: Optional JSON object of arguments, e.g. '{"text": "hi"}'.
+
+    Returns:
+        Tasker's response body, or a clear "ERROR: ..." message if not configured
+        or unreachable (never raises, so the MCP session stays alive).
+    """
+    if not live.is_configured():
+        return (
+            "ERROR: live execution is disabled. Set TASKER_HOST and TASKER_API_KEY "
+            "(and optionally TASKER_PORT) to enable run_tasker_task. This repo's main "
+            "job is to GENERATE validated Tasker XML offline; live execution is opt-in."
+        )
+    try:
+        args = json.loads(arguments_json) if arguments_json else {}
+        if not isinstance(args, dict):
+            return "ERROR: arguments_json must be a JSON object, e.g. '{\"text\": \"hi\"}'."
+    except json.JSONDecodeError as e:
+        return f"ERROR: arguments_json is not valid JSON: {e}"
+
+    try:
+        return live.run_task(task_name, args)
+    except live.TaskerLiveError as e:
+        return f"ERROR: {e}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

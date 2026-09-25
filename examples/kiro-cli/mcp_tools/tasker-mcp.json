@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tasker-mcp": {
+      "command": "python",
+      "args": ["-m", "tasker_mcp"],
+      "env": {
+        "TASKER_HOST": "${TASKER_HOST}",
+        "TASKER_PORT": "${TASKER_PORT}",
+        "TASKER_API_KEY": "${TASKER_API_KEY}"
+      },
+      "disabled": false
+    }
+  }
+}

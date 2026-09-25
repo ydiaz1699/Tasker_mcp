@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "tasker-live": {
+      "command": "/RUTA/A/tasker-mcp-server-cli-x86_64",
+      "args": [
+        "--tools", "/RUTA/A/toolDescriptions.json",
+        "--tasker-host", "${TASKER_HOST}",
+        "--tasker-port", "${TASKER_PORT}",
+        "--tasker-api-key", "${TASKER_API_KEY}",
+        "--mode", "stdio"
+      ],
+      "disabled": false
+    }
+  }
+}
