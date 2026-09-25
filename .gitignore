@@ -56,3 +56,7 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+
+# Generated search index (regenerated from the vendored .md source at build/first run)
+src/tasker_mcp/indexer/data/tasker_index.db
+src/tasker_mcp/indexer/data/tasker_index.db-*

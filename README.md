@@ -10,12 +10,17 @@ tasker-mcp-server/
 │   ├── __init__.py              # Package (v0.1.0)
 │   ├── __main__.py              # Entry point: python -m tasker_mcp
 │   ├── server.py                # FastMCP v3 server (13 tools, 4 resources)
-│   ├── knowledge/               # Complete Tasker reference data
-│   │   ├── actions.py           # 373 action codes (18 categories)
-│   │   ├── events.py            # 82 profile event codes
-│   │   ├── states.py            # 50 profile state codes
+│   ├── knowledge/               # Enrichment data (descriptions, args, variables, patterns)
+│   │   ├── actions.py           # action descriptions + args (enriches the source)
+│   │   ├── events.py            # event descriptions + args
+│   │   ├── states.py            # state descriptions + args
 │   │   ├── variables.py         # 99 built-in variables (%BATT, %WIFI, etc.)
 │   │   └── patterns.py          # 10 common automation patterns
+│   ├── indexer/                 # Search index (n8n-mcp pattern: SOURCE→LOADER→PARSER→DB)
+│   │   ├── loader.py            # fetch+parse Taskomater/Tasker-XML-Info (authoritative)
+│   │   ├── build_db.py          # merge source+knowledge → SQLite + FTS5 (BM25)
+│   │   ├── search.py            # full-text search over the index
+│   │   └── data/                # vendored source .md (versioned) + tasker_index.db (generated)
 │   ├── xml_engine/              # XML generation engine
 │   │   ├── models.py            # Pydantic models (Task, Profile, Project, Contexts)
 │   │   ├── generator.py         # TaskerXMLGenerator (ElementTree)
@@ -126,7 +131,7 @@ xml = (
 agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 ```
 
-## Tools (13)
+## Tools (14)
 
 | Tool | Description |
 |------|-------------|
@@ -143,6 +148,13 @@ agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 | `list_action_categories` | List all 18 action categories with counts |
 | `list_common_patterns` | List 10 pre-built automation patterns |
 | `get_pattern_details` | Get full details of a specific pattern |
+| `run_tasker_task` | (Optional, opt-in) Trigger an existing Tasker task live on the phone via `POST /run_task`. Needs `TASKER_HOST`/`TASKER_API_KEY`. |
+
+> **Diseñar vs ejecutar:** las tools `search_*`/`generate_*`/`validate_*` diseñan y
+> generan XML **offline** (no tocan el teléfono). `run_tasker_task` **ejecuta en vivo**
+> una tarea ya existente en el móvil y es opcional (desactivada si no configuras las
+> env vars). Cómo el LLM evita errores de códigos/argumentos y cómo se integra con el
+> MCP externo `dceluis/tasker-mcp`: ver [`docs/integracion-dceluis.md`](docs/integracion-dceluis.md).
 
 ## Resources (4)
 
@@ -223,6 +235,37 @@ python -c "from tasker_mcp.knowledge import TASKER_ACTIONS; print(len(TASKER_ACT
 # Generate example XML
 python examples/xml_engine_demo.py
 ```
+
+## Search index (how the LLM finds correct codes)
+
+Tasker has no visual "nodes" — every action is a numeric **code**. To stop the LLM
+from inventing codes, this server ships a searchable index built the same way as
+[n8n-mcp](https://github.com/czlonkowski/n8n-mcp): **SOURCE → LOADER → PARSER → DB
+(SQLite + FTS5) → search tools**.
+
+- **SOURCE (authoritative):** [Taskomater/Tasker-XML-Info](https://github.com/Taskomater/Tasker-XML-Info)
+  gives `code → name → kind` for the 373 actions, 82 events and 50 states. A copy is
+  vendored in `indexer/data/Tasker_XML_Codes.md` so builds work offline.
+- **ENRICHMENT:** `knowledge/*.py` adds descriptions, args and the 99 variables/patterns
+  the source doesn't carry.
+- **DB:** `build_db.py` merges both into `tasker_index.db` (SQLite + FTS5, BM25 ranking).
+- The `search_tasker_*` tools query this index. If the DB is missing they **fall back**
+  to the in-memory knowledge base, and the server **auto-builds** the DB on first run.
+
+Rebuild the index (e.g. after a Tasker update):
+
+```bash
+# offline (from the vendored source)
+python -m tasker_mcp.indexer.build_db
+# or re-download the latest source first
+python -m tasker_mcp.indexer.build_db --refresh
+# installed console script
+tasker-mcp-build-index --refresh
+```
+
+The `tasker_index.db` is a generated artifact (git-ignored); only the vendored `.md`
+source is versioned. See [`docs/integracion-dceluis.md`](docs/integracion-dceluis.md)
+for how this prevents errors and how it complements the external live-execution MCP.
 
 ## Data Sources
 
