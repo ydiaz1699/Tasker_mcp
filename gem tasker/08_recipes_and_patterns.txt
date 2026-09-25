@@ -1,0 +1,486 @@
+# Tasker Recipes and Patterns
+
+This file is a small library of common automation recipes. Each recipe is a worked answer to a question users frequently ask ("how do I turn Wi-Fi on at home?", "how do I silence my phone at night?"). The intent is to give you, the assistant, a model answer to lean on when a user describes a similar goal. You do not need to follow these recipes literally. Adapt them to the user's exact situation, swap in the trigger, condition, app, or destination they actually want, and ask before assuming anything they did not say.
+
+Every recipe in this file is the same shape:
+
+1. A one-sentence goal.
+2. A one-paragraph high-level approach.
+3. The legacy-UI navigation steps using exact menu and button labels.
+4. The Task in description format.
+5. The Profile in description format (if the recipe needs a Profile).
+6. A short note on permissions or Android-version constraints, when applicable.
+
+The description format mirrors Tasker's own text export. It is the same format used everywhere else in this corpus. Each Action shows as `A<N>: <Action Name> [ <args> ]`. Each Profile shows its contexts under the profile name, then `Enter Task:` and optionally `Exit Task:`. Always wrap the description-format block in code formatting when you show it to the user, and remind them that the format is for reading, not for importing. The user types the recipe into Tasker by hand.
+
+Every action, event, and state named in this file is in the Tasker actions registry, events registry, or states registry. The names are exactly the user-visible labels. If a recipe calls for a particular feature and the closest match in Tasker is named slightly differently, the recipe uses the real Tasker name and notes the difference inline. Do not invent action names.
+
+## How to use these recipes
+
+A good Tasker answer almost always involves four pieces in this order:
+
+1. The trigger: a Profile context (Location, Time, Day, App, Event, or State) that fires the work.
+2. The condition: optional extra contexts on the same Profile that narrow when the trigger applies, or per-Action `If` conditions inside the Task that branch on the fly.
+3. The work: a Task containing one or more Actions, which actually does the thing the user wants.
+4. The cleanup: an Exit Task linked to the same Profile if the work needs to be undone when the trigger ends.
+
+Most recipes in this file follow that pattern. A few are widget-driven (no Profile, just a Task and a home-screen widget). Where a recipe omits one of the four pieces, it is because the user's intent does not need it.
+
+When you adapt a recipe, change the literal values (locations, times, file paths, app names, message text), not the structure. The structure is what makes the recipe work; the values are what make it the user's.
+
+
+## 1. Turn Wi-Fi on when I get home, off when I leave.
+
+**Goal.** Wi-Fi turns on automatically when the phone enters a chosen area around home, and turns back off when it leaves.
+
+**Approach.** Use a Location context to define a circle around the home coordinates. Attach an Enter Task that toggles Wi-Fi on with the WiFi action. Attach an Exit Task that toggles Wi-Fi off with the same action. Tip the user that Location contexts use the device's location services and that the radius they pick directly affects how reliably the Profile activates. A small radius is more accurate but more brittle on networks with poor location accuracy. Tasker also needs to be allowed to read location in the background for this to work when the screen is off.
+
+**Legacy-UI navigation.**
+1. From the home screen of Tasker, open the Profiles tab.
+2. Tap the `+` button at the bottom-right of the Profiles tab.
+3. In the Add Context picker, tap Location.
+4. In the map screen that opens, pan and zoom to the home address, tap and hold on the map to drop a pin, then use the radius slider to set how wide the geofence should be. Tap the back button to confirm.
+5. Tasker prompts you to pick an Enter Task. Tap New Task, type `Wifi At Home` as the task name, then tap the tick.
+6. In the task editor, tap the `+` button at the bottom.
+7. In the action picker, choose Net, then WiFi.
+8. Set Set to On. Tap the back button to return to the task editor.
+9. Tap the back button to return to the Profiles tab.
+10. If the profile row is collapsed (the Enter Task is not visible next to it), tap the profile name once to expand it. Then long-press on the Enter Task name (the green entry under the profile) and pick Add Exit Task.
+11. Tap New Task, type `Wifi Off`, tap the tick.
+12. Tap the `+` button. Choose Net, then WiFi.
+13. Set Set to Off. Tap the back button twice to return to the Profiles tab.
+
+**Task in description format:**
+
+    Task: Wifi At Home
+    A1: WiFi [ Set: On ]
+
+    Task: Wifi Off
+    A1: WiFi [ Set: Off ]
+
+**Profile in description format:**
+
+    Profile: Wifi At Home
+    Location: <home latitude> / <home longitude> / 150m
+    Enter Task: Wifi At Home
+    A1: WiFi [ Set: On ]
+
+    Exit Task: Wifi Off
+    A1: WiFi [ Set: Off ]
+
+**Permissions and Android-version notes.** The Location context needs both the Location permission and the background location permission so it still triggers when the screen is off. On Android 10 and newer, toggling Wi-Fi from a regular app is restricted; the WiFi action may need root, ADB Wifi, or a Tasker helper for it to actually flip the switch. If the user cannot use any of those, suggest the Connect To WiFi action with a specific network name as the alternative.
+
+
+## 2. Silence the phone at night.
+
+**Goal.** The ringer switches to silent every evening at a chosen hour and comes back to normal in the morning.
+
+**Approach.** Use a Time context to define the silent window (for example 22:00 to 07:00). Attach an Enter Task that uses the Silent Mode action to flip the ringer to Vibrate (or use the Interrupt Mode action for full Do Not Disturb). Attach an Exit Task that uses the same action to flip it back to Off, which restores normal ring. The Time context covers the schedule fully, so there is no need to mix in a Day context unless the user only wants this on weeknights, in which case add a Day context with the desired days.
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button.
+3. In the Add Context picker, tap Time.
+4. In the time editor, set From to 22:00 and To to 07:00. Tap the back button to confirm.
+5. Tap New Task, type `Silent Night`, tap the tick.
+6. Tap the `+` button. Choose Audio, then Silent Mode.
+7. Set Mode to Vibrate. Tap the back button.
+8. From the Profiles tab, expand the profile if the Enter Task is not visible (tap the profile name once). Then long-press the green Enter Task entry and pick Add Exit Task.
+9. Tap New Task, type `Ringer Normal`, tap the tick.
+10. Tap the `+` button. Choose Audio, then Silent Mode.
+11. Set Mode to Off. Tap the back button twice.
+
+**Task in description format:**
+
+    Task: Silent Night
+    A1: Silent Mode [ Mode: Vibrate ]
+
+    Task: Ringer Normal
+    A1: Silent Mode [ Mode: Off ]
+
+**Profile in description format:**
+
+    Profile: Silent Night
+    Time: From 22:00 Till 07:00
+    Enter Task: Silent Night
+    A1: Silent Mode [ Mode: Vibrate ]
+
+    Exit Task: Ringer Normal
+    A1: Silent Mode [ Mode: Off ]
+
+**Permissions and Android-version notes.** On modern Android the Silent Mode action exposes Off and Vibrate; for full Do Not Disturb behaviour, swap it for the Interrupt Mode action set to None or Priority. Either way, Tasker needs Do Not Disturb access granted in system settings, and it prompts for that the first time the action runs.
+
+
+## 3. Speak incoming SMS sender and text out loud.
+
+**Goal.** When a text message arrives, Tasker reads the sender's name and the body of the message aloud.
+
+**Approach.** Use a Received Text event so the Task fires once for each incoming SMS. The event exposes the built-in variables `%SMSRF` (the sender's number or name) and `%SMSRB` (the body of the message). Use the Say action to read both. Optionally guard the read-out with an If so it only happens when the screen is off or when headphones are connected. Warn the user that an Event context fires every time the event happens, so the Say action will speak every single text that arrives unless filtered.
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button.
+3. In the Add Context picker, tap Event.
+4. In the Event category picker, tap Phone.
+5. Tap Received Text.
+6. Leave Type as Any (or pick SMS only). Tap the back button.
+7. Tap New Task, type `Read SMS`, tap the tick.
+8. Tap the `+` button. Choose Alert, then Say.
+9. In the Text field, type `Message from %SMSRF. %SMSRB`. Tap the back button.
+10. Tap the back button to return to the Profiles tab.
+
+**Task in description format:**
+
+    Task: Read SMS
+    A1: Say [ Text: Message from %SMSRF. %SMSRB ]
+
+**Profile in description format:**
+
+    Profile: Read SMS
+    Event: Received Text [ Type: Any ]
+    Enter Task: Read SMS
+    A1: Say [ Text: Message from %SMSRF. %SMSRB ]
+
+**Permissions and Android-version notes.** The Received Text event needs the Receive SMS permission. Tasker prompts for it the first time you set up the Profile. Some Android skins block the Say action when the screen is off; if nothing is spoken at night, check the device's battery optimisation settings and exempt Tasker.
+
+
+## 4. Show a notification when battery is low.
+
+**Goal.** A persistent notification appears as soon as the battery drops to a chosen percentage.
+
+**Approach.** Use the Battery Level state and set the From and To range so the state is active only when the level is at or below the threshold (for example From 0 To 20 means "active while battery is between zero and twenty percent"). Attach an Enter Task that uses the Notify action to post a notification with a clear title and an alert intensity. Because Battery Level is a State, the Profile is active for the whole time the battery sits in the chosen range. The Enter Task runs once at the moment the state becomes active; Tasker does not repeat the notification while the state stays active.
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button.
+3. In the Add Context picker, tap State.
+4. In the State category picker, tap Power.
+5. Tap Battery Level.
+6. Set From to 0 and To to 20. Tap the back button.
+7. Tap New Task, type `Battery Low Notify`, tap the tick.
+8. Tap the `+` button. Choose Alert, then Notify.
+9. In Title type `Battery Low`. In Text type `Battery at %BATT percent`. Pick an icon if you like. Tap the back button twice.
+
+**Task in description format:**
+
+    Task: Battery Low Notify
+    A1: Notify [ Title: Battery Low Text: Battery at %BATT percent ]
+
+**Profile in description format:**
+
+    Profile: Battery Low Notify
+    State: Battery Level [ From: 0 To: 20 ]
+    Enter Task: Battery Low Notify
+    A1: Notify [ Title: Battery Low Text: Battery at %BATT percent ]
+
+**Permissions and Android-version notes.** On Android 13 and newer, the Notify action needs the Notifications permission. Tasker prompts for it the first time the action runs. If you want a sound or vibration with the popup, use the Notify Sound or Notify Vibrate action instead.
+
+
+## 5. Open Google Maps with a saved destination via a widget.
+
+**Goal.** Tapping a home-screen widget opens Google Maps with navigation already started for a chosen address or coordinate.
+
+**Approach.** Build a small Task that calls Browse URL with a Google Maps URL of the form `google.navigation:q=<address>` or `geo:<lat>,<lng>?q=<lat>,<lng>(<label>)`. Pick the Maps app in the Package/App Name field so Tasker hands the URL straight to Maps rather than asking which app to use. Once the Task works, drag the Task widget onto the home screen and bind it to this Task. Some launchers also let you make a launcher shortcut from the same Task via the Setup App Shortcuts action.
+
+**Legacy-UI navigation.**
+1. Open the Tasks tab.
+2. Tap the `+` button.
+3. Type `Open Maps Home`, tap the tick.
+4. Tap the `+` button in the action picker.
+5. Choose Net, then Browse URL.
+6. In URL, type `google.navigation:q=<the destination address or lat,lng>`.
+7. In Package/App Name, type or pick Maps.
+8. Tap the back button to return to the Tasks tab.
+9. Long-press your home screen, pick Widgets, find Tasker, then drag the Task widget onto the home screen.
+10. Tasker asks which Task to bind. Pick `Open Maps Home`. Pick or assign an icon. Tap the back button.
+
+**Task in description format:**
+
+    Task: Open Maps Home
+    A1: Browse URL [ URL: google.navigation:q=<destination> Package/App Name: com.google.android.apps.maps ]
+
+**Permissions and Android-version notes.** No special Tasker permission is needed. Google Maps must already be installed and signed in. If Maps prompts for a destination instead of starting navigation directly, double-check the URL is `google.navigation:q=` and not `geo:`; the second form opens Maps without auto-starting navigation.
+
+
+## 6. Toggle dark mode on a schedule.
+
+**Goal.** The device switches to dark theme in the evening and back to light theme in the morning, on a schedule the user chooses.
+
+**Approach.** Use a Time context to mark the dark-theme window (for example 19:00 to 07:00). Attach an Enter Task that uses the Night Mode action set to Yes (Night Mode is the Tasker action name for Android's dark theme). Attach an Exit Task that uses the same action set to No. If the user already follows the device's own scheduled dark mode in system settings, this Profile may fight the system schedule; suggest they pick one mechanism, not both.
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button.
+3. In the Add Context picker, tap Time.
+4. Set From to 19:00 and To to 07:00. Tap the back button.
+5. Tap New Task, type `Dark On`, tap the tick.
+6. Tap the `+` button. Choose Display, then Night Mode.
+7. Set Mode to On. Tap the back button.
+8. From the Profiles tab, expand the profile if it is collapsed (tap the profile name once so its Enter Task becomes visible). Then long-press the Enter Task entry and pick Add Exit Task.
+9. Tap New Task, type `Dark Off`, tap the tick.
+10. Tap the `+` button. Choose Display, then Night Mode.
+11. Set Mode to Off. Tap the back button twice.
+
+**Task in description format:**
+
+    Task: Dark On
+    A1: Night Mode [ Mode: On ]
+
+    Task: Dark Off
+    A1: Night Mode [ Mode: Off ]
+
+**Profile in description format:**
+
+    Profile: Dark Mode Schedule
+    Time: From 19:00 Till 07:00
+    Enter Task: Dark On
+    A1: Night Mode [ Mode: On ]
+
+    Exit Task: Dark Off
+    A1: Night Mode [ Mode: Off ]
+
+**Permissions and Android-version notes.** The Night Mode action toggles the system-wide dark theme setting on devices that support it. On some manufacturer skins the action only switches the wallpaper or the launcher theme rather than the full system theme. If the user wants to react to the system theme rather than control it, they should add a Profile with a Dark Mode state context instead.
+
+
+## 7. Backup a folder daily.
+
+**Goal.** A chosen folder gets bundled into a single ZIP file once a day, and optionally uploaded to Google Drive.
+
+**Approach.** Use a Time context that fires once a day (for example From 03:00, with the To field left blank so it fires once at that instant). Attach an Enter Task that uses the Zip action to bundle the folder, then optionally GD Upload to push the ZIP to Google Drive. Variable Set lets the Task build a dated filename like `backup-%DATE.zip` so each day's backup is preserved. Warn the user that the Zip action overwrites the output file if it already exists; suggest dating the filename so previous backups are not lost.
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button.
+3. In the Add Context picker, tap Time.
+4. Set From to 03:00. Leave To empty. Tap the back button.
+5. Tap New Task, type `Backup Folder`, tap the tick.
+6. Tap the `+` button. Choose Variables, then Variable Set.
+7. In Name type `%backupName`. In To type `backup-%DATE.zip`. Tap the back button.
+8. Tap the `+` button. Choose File, then Zip.
+9. In File pick the folder you want to back up. In Output File type the full path including `%backupName`. Tap the back button.
+10. (Optional) Tap the `+` button. Choose Google Drive, then GD Upload.
+11. In Data / File enter the same full path as the ZIP from step 9. In Remote Folder enter the target folder name on Drive. Tap the back button twice.
+
+**Task in description format:**
+
+    Task: Backup Folder
+    A1: Variable Set [ Name: %backupName To: backup-%DATE.zip ]
+    A2: Zip [ File: /sdcard/MyFolder Delete Orig: Off Level: 5 Output File: /sdcard/Backups/%backupName ]
+    A3: GD Upload [ Data / File: /sdcard/Backups/%backupName Remote File Name: %backupName Remote Folder: Tasker Backups ]
+
+**Profile in description format:**
+
+    Profile: Daily Backup
+    Time: From 03:00
+    Enter Task: Backup Folder
+    A1: Variable Set [ Name: %backupName To: backup-%DATE.zip ]
+    A2: Zip [ File: /sdcard/MyFolder Delete Orig: Off Level: 5 Output File: /sdcard/Backups/%backupName ]
+    A3: GD Upload [ Data / File: /sdcard/Backups/%backupName Remote File Name: %backupName Remote Folder: Tasker Backups ]
+
+**Permissions and Android-version notes.** Tasker needs full file access to read and write the source and destination folders. On Android 11 and newer, granting Tasker All Files Access in system settings is the simplest way to make this work for arbitrary paths. GD Upload requires the user to sign in with their Google account the first time it runs.
+
+
+## 8. Send a Telegram message from a button on the home screen.
+
+**Goal.** Tapping a home-screen widget opens a pre-filled Telegram chat with a chosen message ready to send.
+
+**Approach.** Telegram accepts a `tg://` deep link and an `https://t.me/share/url?url=...&text=...` web link. Build a Task that uses Browse URL with one of those URLs, pointing at the contact or chat. Bind that Task to a home-screen Task widget. Tasker cannot post directly into Telegram without user confirmation; the deep link opens Telegram, fills the message, and the user taps Send. If the user wants the message sent without confirmation, suggest one of the AutoNotification or AutoInput plugin combinations rather than promising something Tasker alone cannot deliver.
+
+**Legacy-UI navigation.**
+1. Open the Tasks tab.
+2. Tap the `+` button.
+3. Type `Send Telegram`, tap the tick.
+4. Tap the `+` button. Choose Net, then Browse URL.
+5. In URL type `https://t.me/share/url?url=&text=Hello%20from%20Tasker`. (Replace the text with whatever message you want.)
+6. In Package/App Name, type or pick Telegram.
+7. Tap the back button twice.
+8. Long-press your home screen, pick Widgets, find Tasker, drag the Task widget on, bind it to `Send Telegram`, and pick an icon.
+
+**Task in description format:**
+
+    Task: Send Telegram
+    A1: Browse URL [ URL: https://t.me/share/url?url=&text=Hello%20from%20Tasker Package/App Name: org.telegram.messenger ]
+
+**Permissions and Android-version notes.** No Tasker permission is needed beyond what the user already grants for normal use. Telegram must be installed and the user must be signed in. The exact share URL Telegram accepts can change over time; if the link stops working, try the `tg://msg?text=...&to=<phone>` form or a contact-specific `https://t.me/<username>` link instead.
+
+
+## 9. Auto-reply to specific apps' notifications.
+
+**Goal.** Whenever a notification from a chosen app arrives, Tasker runs a custom Task in response (for example, speaks the text aloud, logs it, or fires a Compose SMS reply).
+
+**Approach.** Use the Notification event under the UI category. Filter it by Owner Application so it only matches the apps you care about. Inside the Enter Task, use the built-in variables the event exposes (the notification title, text, and so on) to react. Tasker on its own cannot tap the reply button inside another app's notification; for that, the user needs the AutoNotification plugin's Reply action. If the user is fine with a side-channel reply (an SMS back to a known number, a logged entry, or a spoken summary), Tasker can do that directly.
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button.
+3. In the Add Context picker, tap Event.
+4. In the Event category picker, tap UI.
+5. Tap Notification.
+6. In Owner Application pick the app(s) you care about (for example Gmail, Slack, WhatsApp). Tap the back button.
+7. Tap New Task, type `Notify Auto Action`, tap the tick.
+8. Tap the `+` button. Choose Alert, then Say.
+9. In Text type `New message from %evtprm1`. (The Notification event fills the owner app and title into pattern variables.)
+10. Tap the back button to return to the Profiles tab.
+
+**Task in description format:**
+
+    Task: Notify Auto Action
+    A1: Say [ Text: New message from %evtprm1 ]
+
+**Profile in description format:**
+
+    Profile: Auto-Reply To App
+    Event: Notification [ Owner Application: WhatsApp ]
+    Enter Task: Notify Auto Action
+    A1: Say [ Text: New message from %evtprm1 ]
+
+**Permissions and Android-version notes.** The Notification event needs either the Accessibility Service permission or the Notification Listener permission, depending on how Tasker is configured. Tasker prompts the user to grant whichever is needed the first time the Profile is enabled. If the goal is to actually press the in-notification Reply button inside another app, that requires the AutoNotification plugin; mention it but do not promise step-by-step plugin setup.
+
+
+## 10. Read out the current time on shake.
+
+**Goal.** Shaking the phone makes Tasker speak the current clock time out loud.
+
+**Approach.** Use a Shake event so the Task fires once per shake gesture. Inside the Enter Task, use the Say action with the built-in variable `%TIME` (which holds the current local time in `HH.MM` form). Pick a sensitivity that is high enough to ignore casual movement; a "Medium" or "Hard" sensitivity is a reasonable starting point. If the user wants the date as well, append `%DATE`.
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button.
+3. In the Add Context picker, tap Event.
+4. In the Event category picker, tap Sensor.
+5. Tap Shake.
+6. Set Axis to Lateral (or Any). Set Sensitivity to Medium. Set Duration to Short. Tap the back button.
+7. Tap New Task, type `Speak Time`, tap the tick.
+8. Tap the `+` button. Choose Alert, then Say.
+9. In Text type `The time is %TIME`. Tap the back button to return to the Profiles tab.
+
+**Task in description format:**
+
+    Task: Speak Time
+    A1: Say [ Text: The time is %TIME ]
+
+**Profile in description format:**
+
+    Profile: Speak Time On Shake
+    Event: Shake [ Axis: Lateral Sensitivity: Medium Duration: Short ]
+    Enter Task: Speak Time
+    A1: Say [ Text: The time is %TIME ]
+
+**Permissions and Android-version notes.** The Shake event needs the device's accelerometer, which is present on essentially every phone. Some manufacturer skins aggressively kill background sensor listeners to save battery; if the shake stops triggering after a few hours, the user should exempt Tasker from battery optimisation in system settings.
+
+
+## 11. Run a Tasker setup downloaded from a server (session-only swap).
+
+**Goal.** Once a day, the phone downloads a Tasker setup XML from a URL the user controls and switches the running engine over to it for the current session. The user's saved setup on disk is not touched.
+
+**Approach.** Use a Time context that fires once a day at the chosen hour. Inside the Enter Task, use the HTTP Request action to GET the setup XML into the built-in `%http_data` output variable. Then call the Import Data action with Type set to Configuration and Variable set to `%http_data` so the running engine starts using the downloaded profiles and tasks. If the user only wants to add a single downloaded task rather than swap the whole runtime, set Type to Task instead, and host a task-only XML at the URL.
+
+**The big caveat (be up front about this).** The Import Data action is session-only. It changes what the runtime monitor is watching for the current process, but it does not save anything to disk. The Tasker UI keeps showing the user's original setup, because the editor reads the on-disk copy. When Tasker is restarted (manual kill, reboot, Android system kill), the runtime reloads the original disk copy and the downloaded setup is gone. Anything saved from the editor after an import also writes the editor's original copy back over the runtime. Recommend this recipe only when the user wants to *run* a downloaded automation for the current session, not when they want to *replace* their saved setup. Tell them plainly: "Tasker does not have a built-in way to permanently sync your saved setup from a server. Import Data only swaps the running engine for this session." If they want true sync, that needs a backup-and-restore strategy outside Tasker (manually replacing Tasker's data files, or using Tasker's own Local Auto-Backup feature combined with a sync tool).
+
+**Legacy-UI navigation.**
+1. Open the Profiles tab.
+2. Tap the `+` button at the bottom right.
+3. In the Add Context picker, tap Time.
+4. Set From to the time you want the sync to happen (for example 07:00). Leave To at the default if you only want it to fire at the start time. Tap the back button.
+5. Tap New Task, type `Sync From Server`, tap the tick.
+6. In the task editor, tap the `+` button.
+7. Choose Net, then HTTP Request.
+8. Set Method to GET. Set URL to the address of your setup XML (for example `https://example.com/tasker/latest.xml`). Tap the back button.
+9. Tap the `+` button again. Choose Tasker, then Import Data.
+10. Set Type to Configuration. Set Source to Variable. Set Variable to `%http_data`. Tap the back button twice to return to the Profiles tab.
+
+**Task in description format:**
+
+    Task: Sync From Server
+    A1: HTTP Request [ Method: GET URL: https://example.com/tasker/latest.xml ]
+    A2: Import Data [ Type: Configuration Source: Variable Variable: %http_data ]
+
+**Profile in description format:**
+
+    Profile: Daily Sync
+    Time: From 07:00
+    Enter Task: Sync From Server
+    A1: HTTP Request [ Method: GET URL: https://example.com/tasker/latest.xml ]
+    A2: Import Data [ Type: Configuration Source: Variable Variable: %http_data ]
+
+**Permissions and Android-version notes.** HTTP Request needs internet access, which Tasker has by default. Import Data is session-only: nothing is written to disk, so the visible setup in the Tasker UI does not change and restarting the app reverts to the original. If the user wants the imported setup to survive a restart, this recipe is not the right tool; they need to manually replace Tasker's backup file outside the app (out of scope for the in-app Tasker engine). On some Android skins, scheduled Time triggers stop firing after the phone has been idle for hours; exempt Tasker from battery optimisation if the morning trigger is unreliable.
+
+
+## 12. Use a content:// image variable (like an app icon) inside a JavaScriptlet.
+
+**Goal.** A JavaScriptlet needs to work with an image that Tasker hands it as a variable, for example the icon from the App Info action (`%app_icon`), rather than a file on disk. The user wants the image's data, such as a base64 string to send somewhere or its raw pixels to inspect.
+
+**The key fact.** Image-type Tasker variables are not file paths. The App Info icon output is a content:// link served by Tasker. There is nothing to convert to a file. The JavaScript and JavaScriptlet actions run in an embedded browser environment, so the link loads directly into an `Image` and onto a `<canvas>`, and the canvas can be read back as raw pixels or as a base64 data URL. Do not build file-conversion steps, and do not pass the link to the built-in `loadImage()` or `readFile()` helpers: those accept file paths only and reject a content:// link, which is the usual reason answers spiral into broken conversions.
+
+**Watch the timing.** Loading an image is asynchronous. In the JavaScriptlet action, turn Auto Exit off and set a Timeout (for example 10), then call `exit()` yourself once the image has loaded. With Auto Exit on, the action finishes before the image's onload runs and you get nothing back.
+
+**Approach.** Run App Info first so `%app_icon` is set, then run a JavaScriptlet whose code is:
+
+    var src = local('app_icon');            // the content:// link from App Info
+    var img = new Image();
+    img.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        setLocal('icon_base64', canvas.toDataURL('image/png'));   // base64 data URL
+        // or inspect pixels: ctx.getImageData(0, 0, img.width, img.height)
+        exit();
+    };
+    img.onerror = function () { setLocal('icon_base64', ''); exit(); };
+    img.src = src;
+
+After it runs, `%icon_base64` holds the icon as a `data:image/png;base64,...` string.
+
+**Legacy-UI navigation.**
+1. Open the Tasks tab and create or open a task.
+2. Tap the `+` button. Choose App, then App Info. Set Package/App Name to the app you want (or leave it on the current app). Tap the back button. This sets `%app_icon`.
+3. Tap the `+` button again. Choose Code, then JavaScriptlet.
+4. Paste the script above into Code. Untick Auto Exit. Set Timeout (Seconds) to 10. Tap the back button.
+5. The task now ends with `%icon_base64` holding the icon as a base64 string.
+
+**Simpler still:** if you only need to display or reuse the icon in another Tasker action, skip JavaScript entirely. Most actions that take an image accept `%app_icon` (the content:// link) directly, so just put the variable in that action's image field.
+
+**Notes.** The canvas read works because Tasker's JavaScript actions are allowed to load content:// links and read them back; treat that as specific to these actions, not a general guarantee about web pages.
+
+
+## Combining recipes
+
+These recipes are starting points. Real automations usually combine them. Examples:
+
+- A Profile with both a Location context (home) and a Time context (after sunset) only activates when both are true, so the user can chain a "lights on" task that runs only after dark when they get home.
+- An Event context can be added to a Profile that already has a State context. The Event fires only while the State is active, so "speak SMS only while headphones are connected" is a Received Text event combined with a Headset Plugged state on the same Profile.
+- An Enter Task can call Perform Task to chain further work, and that further work can include an If guard so the same Profile behaves differently on weekends.
+- A Profile's Enter Task can launch a Scene built from the Scene category Actions (Show Scene, Element Value, Element Visibility, and so on) to present a custom interactive screen rather than a notification.
+
+## Common pitfalls
+
+A few mistakes show up over and over when users first try these recipes:
+
+- **Event vs State confusion.** Received Text, Notification, and Shake are Events; they fire once. Battery Level, Headset Plugged, and Dark Mode are States; they stay active for a duration. If the user wants the work to repeat every time something happens, they need an Event. If they want the work to run once when a condition becomes true and again only when it becomes true again, they need a State.
+- **Exit Task forgotten.** A Profile with only an Enter Task and no Exit Task will flip Wi-Fi on at home and never flip it off when the user leaves. The Exit Task is added by long-pressing the green Enter Task entry, not from a separate menu. If that long-press menu never appears, the profile row is collapsed; tap the profile name once to expand it, then long-press the Enter Task entry. The same applies to the Context Options popup (the long-press menu on the context icons): it only opens while the profile is expanded.
+- **Per-Action conditions instead of context filters.** If the same Task runs in many places but should only do real work in some of them, an `If` Action at the top of the Task that bails out early is cleaner than building five almost-identical Profiles.
+- **Background restrictions.** On Android 12 and newer, manufacturer skins routinely kill apps that sit idle waiting for sensors. If a Profile with a Shake or Battery Level trigger stops firing after a few hours, the user almost certainly needs to exempt Tasker from battery optimisation in system settings.
+- **Wi-Fi and other settings actions restricted by Android.** From Android 10 onward, regular apps cannot toggle Wi-Fi programmatically. Tasker still ships the WiFi action, but on stock Android the user needs root, ADB Wifi, or a Tasker helper for it to work. Recommend the Connect To WiFi action as a partial workaround when the goal is to join a specific network.
+
+## Helpful built-in variables
+
+When writing a recipe, lean on Tasker's built-in variables instead of hard-coding values. The common ones:
+
+- `%TIME` and `%TIMES` for the current clock time (formatted and seconds-since-epoch).
+- `%DATE` for the current date.
+- `%BATT` for the current battery percentage.
+- `%LOC` and `%LOCN` for the latest GPS and network location fixes.
+- `%SMSRF` and `%SMSRB` for the most recent SMS sender and body, populated by the Received Text event.
+- `%WIFI` and `%WIFII` for the current Wi-Fi connection state and network name.
+- `%SCREEN` for whether the screen is on.
+- `%FOTO` for the path of the most recent Take Photo result.
+
+A full list of built-in variables lives in the variables section of this corpus. Always confirm a variable name there before using it in a recipe.
+
+## Closing guidance
+
+When a user asks for an automation that does not match any of these recipes exactly, pick the closest one, replace the trigger and the action set with the ones the user actually needs, and check the action, event, and state registries to confirm each name. If the trigger or condition the user wants is not in the registries, say so plainly and offer the closest real Tasker capability. If the user wants something that needs a plugin (notification reply, lock-screen widgets, advanced UI automation), mention the plugin by name at a high level and recommend the plugin's own documentation rather than guessing at its menus.
+
+Above all, ask before you assume. "Home" might be a Wi-Fi network, a GPS area, or a Bluetooth device. "At night" might be a clock range, sunset to sunrise, or just while the screen is off. The recipes above pick a sensible default for each phrase, but the right default for the user in front of you depends on details only they can give.

@@ -1,0 +1,939 @@
+# Legacy UI Interaction Tree
+
+This file maps every screen, tab, button, menu, and dialog a Tasker user can reach by tapping or long-pressing inside the legacy interface. The map is built from the labels Tasker actually shows in the app. Read this when you need to tell a user "where is X" or "how do I get to Y".
+
+The map is split into two parts:
+
+1. **Prose intro.** What a new user sees on first launch, the four tabs of the main screen, the floating `+` button, the overflow menu, the project drawer, the long-press pattern, and a typical first-time flow.
+2. **Interaction tree.** A hierarchical text map of taps, long-presses, and menu items, organised by entry point.
+
+# Part 1. The first thing a new user sees
+
+When you open Tasker the first thing on screen is a single Activity called the main screen. The name across the top is just "Tasker". Below the title bar are four tabs:
+
+- Profiles
+- Tasks
+- Scenes
+- Vars
+
+The selected tab fills the body of the screen with a list of items of that type. New users land on Profiles by default and see an empty list.
+
+At the bottom-right corner of the screen there is a circular floating button with a plus icon. This is the main "add" control. **The `+` button does a different thing depending on which tab is showing.** This is the single most common point of confusion for new users.
+
+- On the Profiles tab, the `+` button opens a small picker that asks "what kind of trigger do you want": Application, Time, Day, Location, State, or Event. You pick one, configure it, then Tasker asks which task to run when the trigger fires.
+- On the Tasks tab, the `+` button asks for a name for a new Task, then opens the Task editor (which is empty until you add Actions to it).
+- On the Scenes tab, the `+` button asks for a name for a new Scene, then opens the Scene editor (which starts as a blank canvas).
+- On the Vars tab, the `+` button asks for a name for a new Variable. The name must start with `%` and the first letter after `%` must be uppercase if you want the Variable to be global (visible to every task).
+
+A long-press on the `+` button opens the AI Automation Generator (a separate screen that lets you describe what you want in plain language and have Tasker draft a Profile, Task, or Project for you).
+
+In the title bar at the top-right is the overflow menu (the three-dot icon). It is the same on every tab. It contains the global commands: TaskerNet, Tutorials/Pre-made Projects, Disable Tasker / Enable Tasker (one or the other depending on the current state), Preferences, Monitoring, Data, Info, More, Search Tasker, and Report Issue To Developer. Some of those are submenus that open further menus when tapped. The full layout of the overflow menu is in the tree below.
+
+At the bottom of the screen is the **project drawer**. It is a horizontal strip of project tabs. New installs start with a single project called "Base", marked with a home icon. You cannot delete or rename Base. As you add projects they appear to the right of Base in the drawer. Tap a project to switch the four tabs above to show only the contents of that project. Long-press a project (or tap an already-selected project) to open the project options menu (add, delete, export, rename, lock, import, set icon, shift left, shift right, properties, select project).
+
+The four tabs above the list (Profiles, Tasks, Scenes, Vars) are also long-pressable. Long-pressing the Profiles, Tasks, or Scenes tab opens a small menu with "Set Sort" and an import option for that entity type. Long-pressing the Vars tab opens a menu with "Clear All" and "Filter".
+
+To **edit** an item (profile, task, scene, variable) you tap the corresponding tab and then tap the item. Tapping a profile expands it to show its Enter Task, Exit Task, and context icons; tapping the profile name again collapses the row. When a profile is collapsed those targets are not on screen, so any instruction that says "long-press the Enter Task" or "long-press a context icon" first requires tapping the profile name to expand the row. A user setting called Profile Auto-Collapse Mania can auto-collapse profiles after a delay, so do not assume a profile that was expanded a minute ago is still expanded now. Tapping a task opens the Task editor; tapping a scene opens the Scene editor; tapping a variable opens a popup to edit the variable's value.
+
+To **delete, rename, clone, lock, disable, or export** an item, long-press it. A contextual action bar slides in at the top of the screen with the available commands as icons or text (Delete, Rename, Clone, Lock, Disable, Properties, Export, etc.). Tap the icons to act on the selection. Tap items to add more to the selection. The contextual bar exits when you tap its back arrow or press the device Back button.
+
+The typical first-time flow:
+
+1. Tap the `+` button on Profiles.
+2. Pick a context type (Application, Time, Day, Location, State, or Event).
+3. Configure that context (pick an app, a time range, days of the week, etc.). Tap the device Back button or the bar's accept icon to save the context.
+4. Tasker pops up a task picker. Pick "New Task" at the top of the list, give the task a name (or leave it blank for an anonymous task), and the Task editor opens.
+5. Inside the Task editor tap the `+` button at the bottom to add the first Action. Pick a category, then an action inside that category, then fill in the action's fields. Tap the accept icon at the top-left to save the action.
+6. Repeat to add more actions, or tap the accept icon at the top-left of the Task editor to save the task and return to the profile list.
+7. Tasker now shows the new profile with the trigger on the left and the linked task on the right. The profile is on by default.
+
+# Part 2. Interaction tree
+
+The tree is a hierarchical map. Each line is one user-visible label. `├──` and `└──` mark branches. `│  ` marks vertical continuation between siblings.
+
+```
+Main Screen
+├── Title bar
+│   ├── Home icon (tap)
+│   │   └── Toggles the project drawer between Base and the last-used project
+│   ├── Home icon (long-press)
+│   │   └── Disable Tasker / Enable Tasker (whichever applies)
+│   ├── Subtitle text
+│   │   └── Shows the current project name and active profile count
+│   └── Overflow menu (three dots, top-right)
+│       ├── TaskerNet
+│       │   └── Opens the in-app TaskerNet browser (shared profiles, tasks, projects)
+│       ├── Tutorials/Pre-made Projects
+│       │   └── Opens a curated list of starter projects
+│       ├── Disable Tasker / Enable Tasker
+│       │   └── Toggles Tasker monitoring on or off
+│       ├── Preferences
+│       │   └── Opens the Settings screen (see "Settings Screen" branch below)
+│       ├── Monitoring (submenu)
+│       │   ├── Active Profiles
+│       │   ├── Running Tasks
+│       │   ├── State Variables
+│       │   ├── Run Log
+│       │   └── Export Memory Report
+│       ├── Data (submenu)
+│       │   ├── Clear
+│       │   │   └── Confirmation dialog → wipes all Profiles/Tasks/Scenes/Variables
+│       │   ├── Backup
+│       │   │   └── Writes a full XML backup to local storage
+│       │   ├── Restore (submenu, only if any backup source is available)
+│       │   │   ├── Auto Local Backup (only if auto backups exist)
+│       │   │   ├── User Local Backup
+│       │   │   └── Google Drive Backup
+│       │   ├── Share
+│       │   │   └── Send all Tasker data to another app
+│       │   └── Description (submenu)
+│       │       └── Write File
+│       ├── Info (submenu)
+│       │   ├── Help: This Screen
+│       │   ├── Overview
+│       │   ├── Beginner Videos (submenu)
+│       │   │   ├── Profiles
+│       │   │   ├── Tasks
+│       │   │   ├── Projects
+│       │   │   └── Variables
+│       │   ├── Userguide
+│       │   ├── Guides
+│       │   ├── Support
+│       │   └── More (submenu)
+│       │       ├── About / Credits
+│       │       ├── Privacy Policy
+│       │       ├── Release Notes
+│       │       ├── Device Info
+│       │       └── Source Code Licence Info
+│       ├── More (submenu)
+│       │   ├── Browse Examples (submenu)
+│       │   │   └── User Wiki
+│       │   ├── Android Settings (submenu)
+│       │   │   ├── Accessibility (only if Tasker has Accessibility hooks to offer)
+│       │   │   ├── Usage Access
+│       │   │   ├── Device Admin
+│       │   │   ├── Draw Over Other Apps (only on supported Android versions)
+│       │   │   └── Grant Folder Access (only when document tree access is supported)
+│       │   ├── Run An Action
+│       │   │   └── Picks one action and runs it once, outside any task
+│       │   ├── Manage Permissions (only when Shizuku is installed)
+│       │   ├── Check For New Version / Get New Version (direct distribution only)
+│       │   ├── Order Validation (direct distribution only)
+│       │   ├── Get Latest Version (direct distribution only)
+│       │   └── Developer Options (submenu, hidden in Beginner Mode)
+│       │       ├── Certificate Fingerprint / Create Certificate
+│       │       ├── Delete Certificate (only if a certificate exists)
+│       │       ├── Save Device Capabilities
+│       │       ├── Save Data Definitions
+│       │       └── Save JS Library Template
+│       ├── Search Tasker
+│       │   └── Opens the Search screen (matches against profiles, tasks, actions, variables)
+│       ├── Save & Apply (only shown when there are unsaved edits)
+│       ├── Exit (only shown when there are no unsaved edits)
+│       └── Report Issue To Developer
+│           └── Builds a debug log and shares it with Tasker support
+│
+├── Profiles tab
+│   ├── Tap profile name
+│   │   └── Collapses or expands the profile to show its linked tasks beside it
+│   ├── Tap the enable indicator at the right end of the profile row
+│   │   └── Toggles the profile's enabled state on or off
+│   ├── Tap the linked task name on the right of the profile row
+│   │   └── Opens the Task editor for that task (see "Task editor" branch below)
+│   ├── Long-press the linked task name on the right of the profile row
+│   │   └── Task Options popup
+│   │       ├── Add Enter Task (only if no Enter Task yet)
+│   │       ├── Add Exit Task (only if no Exit Task yet)
+│   │       ├── Move To Enter (only when an Exit Task can be reassigned)
+│   │       ├── Move To Exit (only when an Enter Task can be reassigned)
+│   │       ├── Name (only if the linked task is anonymous)
+│   │       ├── Select Different Task
+│   │       │   └── Task picker → reassign the slot to another existing task or "New Task"
+│   │       └── Unlink Task
+│   │           └── Confirmation → removes the link, deletes the task if it was anonymous
+│   ├── Long-press the context icon(s) at the left of the profile row
+│   │   └── Context Options popup
+│   │       ├── Add (only if the profile has room for more contexts)
+│   │       │   └── Opens the Add Context picker (Application/Time/Day/Location/Event/State)
+│   │       ├── Clone
+│   │       │   └── Clones the context with no linked task and prompts for the task next
+│   │       ├── Delete
+│   │       │   └── Confirmation → removes that context from the profile
+│   │       └── Name (label says "Name" first time, "Rename" thereafter)
+│   │           └── Text popup → renames the context (e.g. to "Home Wi-Fi")
+│   ├── Long-press the profile row body (the name area)
+│   │   └── Contextual action bar at the top of the screen
+│   │       ├── Name
+│   │       │   └── Renames the profile (single selection)
+│   │       ├── Play (not shown for profiles)
+│   │       ├── Properties
+│   │       │   └── Opens Profile Properties (cooldown, restrictions, label, description, etc.)
+│   │       ├── Disable / Enable (only if not always shown on the row)
+│   │       ├── Drag To (only when "List Item Dragging" is set to "Menu")
+│   │       ├── Clone
+│   │       │   └── Single selection: opens a rename popup, then duplicates
+│   │       │   └── Multi selection: duplicates each immediately
+│   │       ├── Delete
+│   │       │   └── Confirmation → removes the profile(s) and any anonymous tasks
+│   │       ├── Export
+│   │       │   └── Export menu (see "Export menu" branch below)
+│   │       ├── Lock / Unlock (only when not in Beginner Mode)
+│   │       ├── Move To Top (only when the sort allows it)
+│   │       ├── Select All
+│   │       └── Move To Project (only when more than one project exists)
+│   ├── + button (bottom right, on this tab)
+│   │   └── If "Ask For New Profile Name" is on: text popup for the profile name first
+│   │   └── Add Context picker
+│   │       ├── Application
+│   │       │   └── App picker
+│   │       │       ├── Search field at the top
+│   │       │       ├── Tap an app row to add it
+│   │       │       ├── Tap several apps to add multiple to the same Application context
+│   │       │       └── Accept icon (top-left) returns to the profile with the chosen apps
+│   │       ├── Time
+│   │       │   └── Time editor
+│   │       │       ├── From time picker (hour and minute)
+│   │       │       ├── To time picker, or "From Only" checkbox
+│   │       │       ├── Repeat checkbox with Every N Hours or Every N Minutes
+│   │       │       └── Accept icon (top-left) saves the time context
+│   │       ├── Day
+│   │       │   └── Day editor
+│   │       │       ├── Day-of-week row (Sun, Mon, Tue, Wed, Thu, Fri, Sat) with toggle buttons
+│   │       │       ├── Month dropdown ("Any Month" or a specific month)
+│   │       │       ├── Day-of-month grid (1 through 31) with toggle buttons
+│   │       │       └── Accept icon saves the day context
+│   │       ├── Location
+│   │       │   ├── If existing locations exist: list popup
+│   │       │   │   ├── New Location (top entry)
+│   │       │   │   │   └── Opens the Location editor (map + radius + Net/GPS toggles)
+│   │       │   │   └── (each existing location, tap to attach the same location)
+│   │       │   └── If no existing locations: directly opens the Location editor
+│   │       ├── State
+│   │       │   └── State category picker (Select State Category)
+│   │       │       ├── App
+│   │       │       ├── Display
+│   │       │       ├── Hardware
+│   │       │       ├── Net
+│   │       │       ├── Phone
+│   │       │       ├── Plugin
+│   │       │       ├── Power
+│   │       │       ├── Sensor
+│   │       │       ├── System
+│   │       │       ├── Tasker
+│   │       │       ├── Variables
+│   │       │       └── Matter Home Automation (Experimental) (only if Matter is enabled)
+│   │       │       └── Picking a category opens the state list with a search box at the top
+│   │       │           └── Picking a state opens the State Edit screen with that state's fields
+│   │       └── Event
+│   │           └── Event category picker (Select Event Category)
+│   │               ├── App
+│   │               ├── Date/Time
+│   │               ├── Display
+│   │               ├── File
+│   │               ├── Hardware
+│   │               ├── Media
+│   │               ├── Net
+│   │               ├── Phone
+│   │               ├── Plugin
+│   │               ├── Power
+│   │               ├── Sensor
+│   │               ├── System
+│   │               ├── Tasker
+│   │               ├── UI
+│   │               ├── Variables
+│   │               ├── Calendar
+│   │               └── 3rd Party
+│   │               └── Picking a category opens the event list with a search box at the top
+│   │                   └── Picking an event opens the Event Edit screen with that event's fields
+│   └── (after the context is configured the task picker appears, see "Task picker" branch below)
+│
+├── Tasks tab
+│   ├── Tap task row
+│   │   └── Opens the Task editor (see "Task editor" branch below)
+│   ├── Long-press task row
+│   │   └── Contextual action bar at the top of the screen
+│   │       ├── Name (single selection)
+│   │       ├── Play
+│   │       │   └── Runs the task once with a test priority, useful for trying it
+│   │       ├── Drag To (only when "List Item Dragging" is set to "Menu")
+│   │       ├── Clone (single selection, not in Beginner Mode)
+│   │       │   └── Opens a rename popup, then duplicates
+│   │       ├── Delete
+│   │       │   └── Confirmation → removes the task(s); profiles linked to it lose the link
+│   │       ├── Export
+│   │       │   └── Export menu (see "Export menu" branch below)
+│   │       ├── Lock / Unlock
+│   │       ├── Move To Top (when sort allows)
+│   │       ├── Show Linked Profiles (single selection)
+│   │       │   └── Lists every profile whose Enter Task or Exit Task is this task
+│   │       ├── Select All
+│   │       └── Move To Project (only when more than one project exists)
+│   ├── + button (bottom right, on this tab)
+│   │   └── Text popup: New Task Name (blank allowed → anonymous task)
+│   │       └── Opens the Task editor with that name
+│   └── Long-press tab name "Tasks"
+│       └── Set Sort
+│       │   └── Sort picker (Alphabetic, Age Newest First, Age Oldest First, User, Named, etc.)
+│       └── Import Task
+│           └── Opens the import dialog (XML file or pasted clipboard text)
+│
+├── Scenes tab
+│   ├── Tap scene row
+│   │   └── Opens the Scene editor (see "Scene editor" branch below)
+│   ├── Long-press scene row
+│   │   └── Contextual action bar at the top of the screen
+│   │       ├── Name (single selection, not for built-in scenes)
+│   │       ├── Play (single selection, Scenes V2 only)
+│   │       │   └── Opens the scene as a preview
+│   │       ├── Drag To (only when "List Item Dragging" is set to "Menu")
+│   │       ├── Clone (single selection, not in Beginner Mode)
+│   │       ├── Delete
+│   │       │   └── Confirmation → removes the scene
+│   │       ├── Destroy (only if the scene is currently displayed)
+│   │       │   └── Closes the live scene window
+│   │       ├── Export
+│   │       │   └── Export menu (see "Export menu" branch below)
+│   │       ├── Edit Element (single selection, not in Beginner Mode)
+│   │       │   └── Element picker → opens the per-element editor directly
+│   │       ├── Lock / Unlock
+│   │       ├── Move To Top (when sort allows)
+│   │       ├── Select All
+│   │       └── Move To Project (only when more than one project exists)
+│   ├── + button (bottom right, on this tab)
+│   │   └── Text popup: New Scene Name
+│   │       └── Asks scene engine version (Scene V1 or Scene V2), then opens the Scene editor
+│   └── Long-press tab name "Scenes"
+│       └── Set Sort
+│       │   └── Sort picker (Alphabetic, Age Newest First, Age Oldest First, User, etc.)
+│       └── Import One Scene
+│           └── Opens the import dialog (XML file or pasted clipboard text)
+│       └── Destroy All (only when at least one scene is live)
+│           └── Confirmation → closes every live scene window
+│
+├── Vars tab
+│   ├── Tap variable row
+│   │   └── Multi-line text popup with the current value
+│   │       └── Edit and dismiss → the new value is stored and any task watching it kicks
+│   ├── Long-press variable row
+│   │   └── Contextual action bar at the top of the screen
+│   │       ├── Name (single selection, only for variables not defined in project data)
+│   │       │   └── Renames the variable in storage (does not rewrite references in tasks)
+│   │       ├── Copy (only if the variable has a stored value)
+│   │       │   └── Copies the value to the system clipboard
+│   │       ├── Clear (only if the variable has a stored value)
+│   │       │   └── Confirmation → removes the stored value
+│   │       └── Select All
+│   ├── + button (bottom right, on this tab)
+│   │   └── Text popup: New Variable Name (preset to "%")
+│   │       └── Saves an empty global variable with that name
+│   └── Long-press tab name "Vars"
+│       ├── Clear All
+│       │   └── Confirmation → removes every stored global value
+│       └── Filter
+│           └── Toggles the filter and tools bar above the variable list
+│
+└── Project drawer (along the bottom of the screen)
+    ├── Tap a project tab
+    │   └── Switches the four entity tabs (Profiles/Tasks/Scenes/Vars) to that project's contents
+    ├── Long-press a project tab (or tap a project tab when it is already selected)
+    │   └── Project Options popup
+    │       ├── Add
+    │       │   └── Text popup: New Project Name → creates a project to the right of the others
+    │       ├── Delete (not for Base)
+    │       │   └── Refile Contents (move into another project) or Delete Contents (delete)
+    │       ├── Export (not for Base)
+    │       │   └── Export menu (see "Export menu" branch below)
+    │       ├── Properties (not for Base)
+    │       │   └── Project Properties screen (icon, description, project variables, init task, etc.)
+    │       ├── Rename
+    │       ├── Lock / Unlock
+    │       ├── Import Project
+    │       │   └── Opens the import dialog (XML file or pasted clipboard text)
+    │       ├── Set Icon
+    │       │   └── Opens the Icon picker (built-in icons, app icons, files, downloaded icon packs)
+    │       ├── Left / Right (not for Base, only if there is room to shift in that direction)
+    │       │   └── Number popup → shifts the project that many positions
+    │       ├── Select Project (only when there are more than 4 projects)
+    │       │   └── List of every project to jump to one
+    │       └── Properties (only for non-Base projects)
+
+
+Task editor (opened from any tap that lands on a task)
+├── Title bar shows "Task Edit"
+├── Title bar (left)
+│   ├── Accept icon
+│   │   └── Saves the task and returns to the previous screen
+│   └── Title text shows the task name (or "Anonymous" for unnamed tasks)
+├── Title bar (right)
+│   ├── Properties icon (gear)
+│   │   └── Task Properties dialog
+│   │       ├── Priority slider (with help button)
+│   │       ├── Keep Device Awake checkbox (with help button)
+│   │       ├── Show In Notification checkbox (with help button)
+│   │       ├── Collision Handling dropdown (Run Both Together, Abort Existing Task, etc.)
+│   │       └── Task Variables button
+│   │           └── Opens the Task Variables editor (per-task variables, hints, prompts)
+│   ├── Search icon (if the task has actions)
+│   │   └── Search field → jumps to the first matching action in the list
+│   ├── Test action icon (play with tick)
+│   │   └── Runs only the currently-selected action with test arguments
+│   ├── Test icon (play)
+│   │   └── Runs the whole task with test priority
+│   ├── Step icon
+│   │   └── Runs the task one action at a time
+│   └── Overflow menu (three dots)
+│       ├── Display Toggles (submenu)
+│       │   ├── Action Labels
+│       │   ├── Action Numbers
+│       │   ├── Icons
+│       │   ├── Loop Markers
+│       │   ├── Margins
+│       │   └── Param Names
+│       ├── Help: This Screen
+│       └── Userguide
+├── Action list (vertical scrollable list of actions, drag to reorder)
+│   ├── Tap an action row
+│   │   └── Opens the Action editor (see "Action editor" branch below)
+│   ├── Long-press an action row
+│   │   └── Contextual action bar at the top of the screen
+│   │       ├── Copy
+│   │       │   └── Copies the selected actions to Tasker's internal clipboard
+│   │       ├── Cut
+│   │       │   └── Removes the actions from the list into Tasker's internal clipboard
+│   │       ├── Clone
+│   │       │   └── Inserts a duplicate right below the selection
+│   │       ├── Convert Into Task
+│   │       │   └── Asks for a new task name, moves the actions there, replaces them with Perform Task
+│   │       ├── Drag To (only when "List Item Dragging" is set to "Menu")
+│   │       ├── Paste (only when something is in Tasker's clipboard)
+│   │       ├── Paste Below (only when something is in Tasker's clipboard)
+│   │       ├── Disable / Enable
+│   │       │   └── Toggles whether the action runs (disabled actions are visually faded)
+│   │       ├── Insert Action (single selection)
+│   │       │   └── Opens the action picker, inserts the chosen action above the selected one
+│   │       ├── Convert To If Block (when the selection is an Action with an If condition)
+│   │       │   └── Wraps the action in matching If/End If actions and drops the condition
+│   │       ├── Convert To Single Action (when the selection is an If/End If block of one action)
+│   │       │   └── Inlines the inner action's If condition and removes If/End If
+│   │       └── Select All
+└── + button (bottom right)
+    └── Action picker
+        ├── Title text: "Select Action Category"
+        ├── Search field at the top
+        │   └── Typing filters all actions (across categories) by name
+        ├── Category grid
+        │   ├── Alert
+        │   ├── App
+        │   ├── Audio
+        │   ├── Calendar
+        │   ├── Code
+        │   ├── Display
+        │   ├── File
+        │   ├── Google Drive
+        │   ├── Image
+        │   ├── Input
+        │   ├── Location
+        │   ├── Media
+        │   ├── Net
+        │   ├── Phone
+        │   ├── Plugin
+        │   ├── Scene
+        │   ├── Scene V2
+        │   ├── Settings
+        │   ├── System
+        │   ├── Task
+        │   ├── Tasker
+        │   ├── Variables
+        │   ├── Zoom (only when the Zoom companion app is installed)
+        │   ├── Matter Home Automation (Experimental) (only when Matter is enabled)
+        │   └── 3rd Party
+        └── Category list
+            ├── Title text: "Select Action" (with the chosen category prepended)
+            ├── Back arrow / device Back → returns to the category grid
+            └── Tap an action → opens the Action editor for that action with empty fields
+
+
+Action editor (opened from any tap on an existing action, or after picking from the picker)
+├── Title bar shows "Action Edit"
+├── Title bar (left)
+│   ├── Accept icon (tick)
+│   │   └── Validates the fields and saves the action back to the task
+│   └── Title text shows the action name
+├── Title bar (right)
+│   ├── Reselect icon
+│   │   └── Reopens the action picker to swap the action for another one
+│   ├── Test icon (play, only for testable actions)
+│   │   └── Runs only this action with the current field values
+│   ├── Help icon (only for actions that have inline help)
+│   │   └── Opens the help text for this action
+│   └── Overflow menu (three dots)
+│       ├── Help: This Screen
+│       └── Action List
+├── Argument fields (vary per action: text, number, dropdown, app picker, file picker, etc.)
+│   ├── Each text field has a magnifying-glass icon
+│   │   └── Opens the variable picker (lists every known global and per-task variable)
+│   ├── Number fields show a slider in addition to the keyboard
+│   ├── App fields tap to open the App picker
+│   ├── Image fields tap to open the Image picker (built-in icons, app icons, files, icon packs)
+│   ├── Task fields tap to open the Task picker
+│   └── Some fields show inline help buttons (?)
+├── If section (always at the bottom)
+│   ├── If checkbox
+│   │   └── Toggles whether the action has an If condition
+│   ├── First operand text field
+│   ├── Operator dropdown (~ matches, !~ doesn't match, =, !=, <, >, etc.)
+│   ├── Second operand text field
+│   ├── + button to add another condition row
+│   └── Each extra row has an And/Or/Xor dropdown
+├── Continue Task After Error checkbox
+│   └── Lets the task continue past this action when it reports failure
+├── Label field
+│   └── User-defined label, shown above the action in the task list
+└── Remote Device field (only on actions that can run remotely)
+    ├── Picks a paired device that should run the action instead of this one
+    └── Remote Timeout (Seconds) field next to it
+
+
+Context arg editor (opened after picking a context type on the Profiles tab)
+├── App context (App picker)
+│   ├── Grid of app icons (every installed launcher app)
+│   ├── Tap an app to add it to the selection (multi-select)
+│   ├── Long-press an app to pick a specific activity inside that app
+│   ├── Bottom toggle row:
+│   │   ├── All toggle → also show apps without launcher icons
+│   │   ├── Activity toggle → show one row per activity instead of one per app
+│   │   ├── Services toggle → also include service components
+│   │   └── Not toggle → invert the matching (matches when none of the picked apps is foreground)
+│   └── Accept icon → returns the multi-app selection to the profile
+├── Time context (Time editor, title "Time Edit")
+│   ├── From row (hour and minute fields, default placeholder "Midnight")
+│   ├── To / Until row (hour and minute fields, default placeholder "Midnight")
+│   ├── "every" checkbox (the repeat toggle)
+│   │   ├── Number field
+│   │   └── Hour(s) / Minute(s) dropdown
+│   └── Accept icon → returns
+├── Day context (Day editor, title "Day Edit")
+│   ├── Days section (toggle buttons for each day of the week)
+│   ├── Months section (toggle buttons for each month, including an "All" toggle)
+│   ├── Day-of-month grid (1 through 31, plus a "Last" tile for the last day)
+│   └── Accept icon → returns
+├── Location context (Location editor)
+│   ├── Map view (movable pin)
+│   ├── Radius slider
+│   ├── Net checkbox
+│   ├── GPS checkbox
+│   ├── Long-press the screen → puts the pin at that coordinate
+│   ├── "Get Fix" button → uses the current device location
+│   ├── Address search field
+│   └── Accept icon → returns
+├── State context (State Edit screen)
+│   ├── Title shows "State Edit"
+│   ├── State name and category at the top
+│   ├── Argument fields (vary per state)
+│   ├── Invert checkbox → fires when the state is NOT the configured value
+│   ├── If section
+│   └── Accept icon → returns
+└── Event context (Event Edit screen)
+    ├── Title shows "Event Edit"
+    ├── Event name and category at the top
+    ├── Argument fields (vary per event)
+    ├── Priority dropdown (Lowest, Low, Normal, High, Highest)
+    ├── Abort Existing Task checkbox
+    ├── If section
+    └── Accept icon → returns
+
+
+Task picker (opened after a context is configured, or from Reselect Task / Add Task)
+├── New Task (top entry)
+│   └── Opens a text popup for the new task name, then opens the Task editor
+├── Each existing task in the current project (alphabetic)
+│   └── Tap → links that task to the profile slot and closes the picker
+├── Each existing task in other projects (faded)
+│   └── Tap → links it to the slot
+└── Search behaviour: typing on the device keyboard scrolls to the first match
+
+
+Scene editor (opened from any tap that lands on a scene)
+├── Title bar shows "Scene Edit"
+├── Title bar (left)
+│   ├── Accept icon
+│   │   └── Saves the scene and exits
+│   └── Title text shows the scene name
+├── Title bar (right)
+│   ├── Touch mode button
+│   │   └── Touch Mode picker (Normal, Move, Resize)
+│   ├── Element picker button
+│   │   └── Element type picker (see "New Element picker" below)
+│   └── Overflow menu (three dots)
+│       ├── Clear (removes every element from the canvas)
+│       ├── Grid Size (snap-size dialog)
+│       ├── Properties (Scene properties: width, height, background colour, orientation, etc.)
+│       ├── Help: This Screen
+│       ├── Userguide
+│       └── Cancel
+├── Canvas (the scene itself)
+│   ├── Tap an empty area
+│   │   └── Element Options popup
+│   │       └── New Element
+│   │           └── Element type picker (see "New Element picker" below)
+│   ├── Tap an existing element
+│   │   └── Selects it (highlights it for the touch-mode buttons)
+│   ├── Long-press an element
+│   │   └── Element Options popup
+│   │       ├── Edit
+│   │       │   └── Opens the per-element editor (see "Scene element editor" below)
+│   │       ├── Copy
+│   │       ├── Delete
+│   │       ├── Set Foreground (when not already at the top)
+│   │       ├── Set As Background (when not already at the bottom)
+│   │       ├── Set Depth (slider over the z-order)
+│   │       ├── Focus
+│   │       ├── Hide / Show
+│   │       ├── Pin / Unpin
+│   │       └── New Element
+│   └── Drag in Move or Resize touch mode (drag the element or its handles)
+└── New Element picker (the dialog above is titled "New Element")
+    ├── Paste (top, only when Tasker's element clipboard has content)
+    ├── Button
+    ├── Checkbox
+    ├── Doodle
+    ├── Image
+    ├── Map
+    ├── Menu
+    ├── Number Picker
+    ├── Oval
+    ├── Rectangle
+    ├── Slider
+    ├── Spinner
+    ├── Switch
+    ├── TextEdit
+    ├── Text
+    ├── Toggle
+    └── WebView
+
+
+Scene element editor (Scene V1, opened from "Edit" on a long-pressed element)
+├── Title text shows the element type plus the element name
+├── Tabs across the top (vary per element type):
+│   ├── UI tab (visual properties: text, colour, image, size, position)
+│   ├── Tap tab (the task to run on tap, and the Tap behaviour)
+│   ├── Long Tap tab (the task to run on long tap, only on tappable elements)
+│   ├── Stroke tab (Map and Image elements: gestures)
+│   └── Properties tab (per-element specific properties)
+└── Accept icon → saves and returns to the canvas
+
+
+New entity name popup (the small text input that pops up from the + button)
+├── Prompt (e.g. "New Profile Name", "New Task Name", "New Scene Name", "New Variable Name")
+├── Hint (e.g. "(optional)" when blank is allowed)
+├── Text field
+│   └── For Variables: prefilled with "%", auto-capitalises the first letter
+├── Accept button → creates the entity with that name
+└── Cancel button or Back → cancels (creating profile without a task offers to clean up)
+
+
+Export menu (opened from Export in any long-press contextual bar, or from a project menu)
+├── As Link (top, not for Scenes)
+│   └── Generates a TaskerNet link copied to the clipboard
+├── As App (only for single Task selection)
+│   └── Builds a standalone app that runs the task on launch
+├── Description To Clipboard
+│   └── Copies the readable export text (see file 07) to the system clipboard
+├── Description In Email
+│   └── Opens an email composer with the readable export text
+├── XML In Email
+│   └── Opens an email composer with the XML attachment
+├── XML To Clipboard
+│   └── Copies the raw XML to the system clipboard
+├── XML to Storage
+│   └── Writes the XML to local storage (or asks for a folder if needed)
+└── Data URI (not for Scenes)
+    └── Encodes the export as a data URI on the clipboard
+
+
+Variable value popup (opened from tapping a variable row on the Vars tab)
+├── Title shows the variable name (e.g. "%MYVAR")
+├── Multi-line text field showing the current value
+├── Accept → stores the new value, kicks any task waiting on the variable
+└── Cancel → leaves the value unchanged
+
+
+Profile Properties screen (opened from the Properties item in a profile's long-press bar)
+├── Title bar shows "Profile Properties"
+├── Launched Task Priority slider
+├── Cooldown Time field (seconds before the profile can re-enter after exiting)
+├── Limit Repeats checkbox
+├── Remaining Repeats field (only when Limit Repeats is on)
+├── Delete On Zero Repeats checkbox (only when Limit Repeats is on)
+├── Enforce Task Order checkbox
+├── Run Exit On Startup checkbox
+├── Restore Settings checkbox
+├── Show In Notification checkbox
+├── Profile Variables button → opens the per-profile variables editor
+└── Accept icon → saves and returns
+
+
+Settings Screen (opened from Preferences in the overflow menu)
+├── Title bar shows "Preferences"
+├── Tabs at the top:
+│   ├── UI
+│   ├── Monitor
+│   ├── Action
+│   └── Misc
+├── Title bar (right)
+│   └── Defaults menu
+│       └── Resets the visible tab to factory defaults
+├── UI tab
+│   ├── UI Lock section
+│   │   ├── Lock Code (text input)
+│   │   ├── Lock On Startup (checkbox)
+│   │   └── Icon Colour From Theme (checkbox)
+│   ├── Localization section
+│   │   ├── Language (dropdown)
+│   │   └── Download Language Pack button
+│   ├── Main Screen section
+│   │   ├── Theme (dropdown)
+│   │   ├── Accent (colour swatch)
+│   │   ├── Orientation (dropdown)
+│   │   ├── Hide Status Bar (dropdown)
+│   │   ├── List Item Dragging (dropdown)
+│   │   ├── Animations (checkbox)
+│   │   ├── Haptic Feedback (checkbox)
+│   │   ├── Hardware Acceleration (checkbox)
+│   │   ├── Tips (checkbox)
+│   │   └── Always Show Enable Icon (checkbox)
+│   ├── Profile List Control section
+│   │   ├── Name Text Size (slider)
+│   │   ├── Profile Auto-Collapse Mania (slider)
+│   │   └── Ask For New Profile Name (checkbox)
+│   └── General section
+│       ├── Confirm Profile Deletes (checkbox)
+│       └── Confirm Other Deletes (checkbox)
+├── Monitor tab
+│   ├── General Monitoring section
+│   │   ├── Run In Foreground (checkbox)
+│   │   ├── Show Notification Icon (checkbox)
+│   │   ├── Show Notification Icon (No Active Profiles) (checkbox)
+│   │   ├── Notification Icon (icon picker, tap to choose)
+│   │   ├── Custom Notification Layout (dropdown)
+│   │   ├── Notification Action Buttons (three task pickers)
+│   │   └── Use Reliable Alarms (checkbox)
+│   ├── Display On Monitoring section
+│   │   ├── Application Check method (dropdown)
+│   │   ├── Application Check MilliSeconds (text)
+│   │   ├── Network Location Check Seconds (text)
+│   │   ├── GPS Check Seconds (text)
+│   │   ├── GPS Timeout Seconds (text)
+│   │   ├── Wifi Scan Seconds (text)
+│   │   ├── Wifi Timeout Seconds (text)
+│   │   ├── BT Scan Seconds (text)
+│   │   ├── BT Minimum Timeout Seconds (text)
+│   │   └── Cell Workaround (checkbox)
+│   ├── Display Off Monitoring section
+│   │   ├── All Checks Seconds (text)
+│   │   ├── Timeout Seconds (text)
+│   │   ├── Net/Cell Wake Screen (checkbox)
+│   │   └── Per-sensor "When Off" dropdowns (Proximity, Light, Magnetic, Pressure, Step, Temperature, Humidity, Accelerometer)
+│   ├── Accelerometer section
+│   │   ├── Orientation State Accuracy (dropdown)
+│   │   ├── Gesture Initial Sample Rate (text)
+│   │   ├── Gesture Match Radius (text)
+│   │   ├── Gesture Match Reset Time (text)
+│   │   └── Calibrate Accelerometer button
+│   └── Debugging section
+│       ├── Popup Errors/Warnings (checkbox)
+│       ├── Debug To System Log (checkbox)
+│       ├── Debug To Internal Storage (checkbox)
+│       ├── ADB Wifi Logcat (checkbox, only on supported Android versions)
+│       ├── Keep Accessibility Service Running button
+│       └── Use Motion Detection (checkbox)
+├── Action tab
+│   ├── Quick Settings Tasks (three task pickers for the three QS tiles)
+│   ├── App Shortcut Tasks (three task pickers for the three launcher shortcuts)
+│   ├── Camera Delay (text)
+│   ├── Maximum Tasks Queued (slider)
+│   ├── Reset Action Error Notifications button
+│   ├── Encryption Algorithm (dropdown)
+│   └── Encryption Iterations (text)
+└── Misc tab
+    ├── Local Auto-Backup Max Age (dropdown)
+    ├── Google Drive Backup (checkbox)
+    ├── New Version Check Frequency (dropdown, direct distribution only)
+    ├── Allow External Access (checkbox)
+    ├── Always View Help Online (checkbox)
+    ├── Reduce Resource Usage (checkbox)
+    ├── Use External Storage (checkbox)
+    ├── Use New Cell API (checkbox, only on Android versions that need it)
+    ├── Flash Problems (checkbox)
+    └── (more rarely-used options shown only on certain devices)
+
+
+# Settings reference: what each preference does
+
+The tree above shows where each preference lives. The list below pairs each preference with what enabling / setting it actually does, plus the available options for dropdown settings. Use this when a user asks "what does this setting do?" or "what options does it have?" instead of describing only its location. Sentences here are short on purpose. Quote them or paraphrase as needed.
+
+## UI tab
+
+### UI Lock section
+
+- **Lock Code** (text). Optional code that locks parts of Tasker. Once set, the code is requested when deleting a locked profile, viewing the source of a locked profile or task, or opening the Preferences screen.
+- **Lock On Startup** (checkbox). If on, the lock code is asked for as soon as Tasker's UI opens, not only when a locked item is touched.
+- **Icon Colour From Theme** (checkbox). Built-in Tasker icons take their colour from the active UI theme. When the icon is shown outside the UI (notifications, widgets) the theme colour is still used.
+
+### Localization section
+
+- **Language** (dropdown). Sets the language of the Tasker UI. Options come from the installed language packs and "System Default".
+- **Download Language Pack** (button). Downloads an extra language file. Useful if your language is not bundled with the app.
+
+### Main Screen section
+
+- **Theme** (dropdown). Picks the overall UI colour theme. Available themes are listed in the dropdown.
+- **Accent** (colour swatch). Picks the accent colour layered on top of the theme.
+- **Orientation** (dropdown). Forces Tasker's UI to a chosen orientation. Options: User (follow the device), Portrait, Landscape.
+- **Hide Status Bar** (dropdown). Controls whether Tasker hides the Android status bar inside its own UI. Options: Never, When Editing Scenes, When In Landscape Orientation, Always.
+- **List Item Dragging** (dropdown). Controls how rows on the Profiles / Tasks / Scenes / Vars tabs are reordered. Options include dragging by long-press and dragging via a menu entry; pick whichever matches your habit.
+- **Animations** (checkbox). Turns Tasker's own UI animations on or off.
+- **Haptic Feedback** (checkbox). Enables short vibrations on taps inside Tasker.
+- **Hardware Acceleration** (checkbox). Off saves memory and the UI is a fraction slower with some decorations missing; on is faster and prettier.
+- **Tips** (checkbox). Shows inline tip popups while you use Tasker. Turn off if you find them noisy.
+- **Always Show Enable Icon** (checkbox). Always shows the enable / disable icon at the end of every profile row in the Profiles list, even when the row would normally hide it.
+
+### Profile List Control section
+
+- **Name Text Size** (slider). Font size used for profile, task, scene, and variable names in the main list.
+- **Profile Auto-Collapse Mania** (slider). How aggressively Tasker auto-collapses profiles on the Profiles tab, from never to always. Excludes profiles that are currently active; you can still tap to expand or collapse by hand.
+- **Ask For New Profile Name** (checkbox). If on, Tasker asks for a profile name as soon as you start creating one. If off, profiles stay anonymous until you name them later.
+
+### General section
+
+- **Confirm Profile Deletes** (checkbox). Shows a confirmation dialog before deleting a profile.
+- **Confirm Other Deletes** (checkbox). Same confirmation for non-profile items (tasks, actions inside tasks, contexts, scenes, variables).
+
+## Monitor tab
+
+### General Monitoring section
+
+- **Run In Foreground** (checkbox). Runs Tasker's monitor service in the Android foreground. When on, Tasker is far less likely to be killed by the system but its notification icon is permanent. When off, Android may kill the service to save power, breaking profiles.
+- **Show Notification Icon** (checkbox). Permanently shows Tasker's icon in the status bar while Tasker is enabled. Some Android versions only allow notifications to be hidden if the icon is shown here.
+- **Show Notification Icon (No Active Profiles)** (checkbox). Same as above, but only while no profiles are currently active. Useful for keeping the icon visible only when something is actually running.
+- **Notification Icon** (icon picker). The icon shown in the status bar when the monitor service runs in foreground. Tap to choose another.
+- **Custom Notification Layout** (dropdown). Whether to customise Tasker's monitor notification and which text colour to use. Options: None, Black Text, Dark Gray Text, Light Gray Text, White Text, Red Text, Orange Text, Green Text, Blue Text, Black Title Grey Text.
+- **Notification Action Buttons** (three task pickers). Up to three tasks can be wired to the buttons inside Tasker's monitor notification, so you can run them from the pull-down.
+- **Use Reliable Alarms** (checkbox). Tasker schedules a real system alarm to keep time-based triggers firing on time, including when the phone is asleep. Helps prevent the system killing Tasker to save power. The trade-off is that the alarm becomes visible in the status bar (and may show on the lock screen as a scheduled alarm a few minutes ahead).
+
+### Display On Monitoring section
+
+These set how often Tasker checks each sensor / signal while the screen is on. Smaller numbers respond faster but use more battery. Larger numbers save battery but may delay profile activation.
+
+- **Application Check method** (dropdown). How Tasker detects which app is in the foreground. Options vary by Android version; the dropdown lists what your device supports. If the App context misbehaves, try the other method.
+- **Application Check MilliSeconds** (text). Milliseconds between application-foreground checks while the screen is on. Default values work for most users; lower this only if app contexts feel slow.
+- **Network Location Check Seconds** (text). Seconds between Network Location fixes used by Location contexts. Lower = more accurate; higher = less battery.
+- **GPS Check Seconds** (text). Same as above for GPS fixes.
+- **GPS Timeout Seconds** (text). How long Tasker keeps GPS on waiting for a fix before giving up, if Android has not already turned it off. Screen-on only.
+- **Wifi Scan Seconds** (text). Seconds between Wi-Fi scans when a "Wifi Near" state is in use.
+- **Wifi Timeout Seconds** (text). Minimum seconds before Wi-Fi scanning is stopped after a successful detection. Tasker adjusts dynamically inside this minimum.
+- **BT Scan Seconds** (text). Seconds between Bluetooth scans when a "BT Near" state is in use.
+- **BT Minimum Timeout Seconds** (text). Minimum seconds before Bluetooth scanning is stopped, similar to Wi-Fi.
+- **Cell Workaround** (checkbox). For Cell Near state only. Enables a workaround for an Android bug where cell tower updates are not received. Enable only if Cell Near has stopped firing.
+
+### Display Off Monitoring section
+
+These take over while the screen is off and Android is in deep sleep. Numbers here can usually be larger than their Display-On counterparts.
+
+- **All Checks Seconds** (text). Seconds between every kind of check (apps, locations, scans) while the screen is off. One value covers everything.
+- **Timeout Seconds** (text). Maximum seconds Tasker spends on any one check pass while the screen is off. Stops the device from staying half-awake too long.
+- **Net/Cell Wake Screen** (checkbox). Briefly turns the screen on (dimly) when Tasker needs to check Cell Near or Network Location. Some devices block these checks unless the screen is on; enable if those contexts misfire at night.
+- **Per-sensor "When Off" dropdowns** (Proximity, Light, Magnetic, Pressure, Step, Temperature, Humidity, Accelerometer). Whether Tasker keeps that sensor active while the screen is off, and how. Options depend on the sensor; common choices are No (never), Yes (always), and Yes If Used (only while a profile actively reads it). Affects the matching state (e.g. Light Level state) and the matching built-in variable (e.g. %LIGHT). The Accelerometer dropdown also affects the Gesture and Shake events.
+
+### Accelerometer section
+
+- **Orientation State Accuracy** (dropdown). How close to the specified orientation the device must be for an Orientation state to count as active. Higher = stricter, lower = more lenient.
+- **Gesture Initial Sample Rate** (text). Rate (in ms) at which the device position is read before any gesture is partially matched. Saves power between gestures.
+- **Gesture Match Radius** (text). How close a live motion must be to the recorded gesture pattern to count as a match. Too low = misses; too high = false positives.
+- **Gesture Match Reset Time** (text). After a partial gesture match, the number of milliseconds without further progress before the match resets. Lower = stricter, higher = more forgiving.
+- **Calibrate Accelerometer** (button). Recalibrates the accelerometer baseline. Useful when readings drift on a specific device.
+
+### Debugging section
+
+- **Popup Errors/Warnings** (checkbox). Flashes warning and error messages on screen when they occur. Not all warnings produce a popup.
+- **Debug To System Log** (checkbox). Sends debugging messages to the Android system log when an action runs or an event is received. The verbosity is high; turn off after debugging.
+- **Debug To Internal Storage** (checkbox). Writes debugging messages to `Tasker/log/tasker.txt` on internal storage. Uses extra power and storage; turn off when not debugging.
+- **ADB Wifi Logcat** (checkbox, only on supported Android versions). Lets Tasker monitor logcat via ADB Wifi instead of triggering the system permission popup every time on Android 13 and newer.
+- **Keep Accessibility Service Running** (button). Picks accessibility services Tasker should try to keep alive if Android kills them. Requires the WRITE_SECURE_SETTINGS permission, granted once via ADB or Shizuku; can also be controlled from a task via the Accessibility Service action.
+- **Use Motion Detection** (checkbox). Reduces power usage while the device is still and speeds up the reaction when it starts moving. Does not work well with BT Near for moving devices, with Wifi/BT Near when the AP or device is being switched on/off, or with GPS location radii under a few tens of metres.
+
+## Action tab
+
+- **Quick Settings Tasks** (three task pickers). Tasks bound to the three Tasker tiles in the Android Quick Settings pull-down. Pick a task per tile.
+- **App Shortcut Tasks** (three task pickers). Tasks bound to the three launcher app shortcuts (long-press the Tasker icon).
+- **Camera Delay** (text). Milliseconds between starting a camera preview and actually taking the photo. Gives auto-focus time. Has no effect on Photo actions in burst sequence mode.
+- **Maximum Tasks Queued** (slider). Maximum tasks that can be waiting to run at the same time. New tasks beyond this are ignored.
+- **Reset Action Error Notifications** (button). Clears Tasker's "do not show me this error again" memory so suppressed action errors will flash again.
+- **Encryption Algorithm** (dropdown). Algorithm used to derive a key from a passphrase and encrypt data with the Encrypt File / Encrypt Text actions. The list reflects what your Android version supports.
+- **Encryption Iterations** (text). Iteration count for the key-derivation step. Higher = slower setup but more brute-force resistance.
+
+## Misc tab
+
+- **Local Auto-Backup Max Age** (dropdown). How long Tasker keeps local backup copies of your data. Auto-backups are made every time you exit the Tasker UI. Options: No Auto-Backups, 12 Hours, 1 Day, 2 Days, 1 Week, 2 Weeks, 1 Month, 2 Months, 6 Months.
+- **Google Drive Backup** (checkbox). Automatically backs up your Tasker data to Google Drive each time it changes. Waits until the device is charging and on Wi-Fi.
+- **New Version Check Frequency** (dropdown, direct distribution only). How often Tasker checks for a new version (only on copies bought outside the Play Store). Options: Never, Every 12 Hours, Every Day, Every 2 Days, Every Week, Every 2 Weeks, Every Month, Every 2 Months, Every 6 Months.
+- **Allow External Access** (checkbox). Lets other apps on the device run existing tasks in your Tasker configuration and query Tasker state. Required for some integrations; leave off if you do not need it.
+- **Always View Help Online** (checkbox). When on, opening Tasker's help links always uses the online userguide instead of the offline copy bundled with the app.
+- **Reduce Resource Usage** (checkbox). Asks Tasker to back off on memory and CPU for some features. Usually means a small drop in responsiveness or feature richness; enable on low-memory devices.
+- **Use External Storage** (checkbox). When exporting a project to an APK ("App Factory"-style export), uses external storage instead of internal. Slower but uses less RAM on tight devices.
+- **Use New Cell API** (checkbox, only on Android versions that need it). Switches Tasker to a newer Android cell-detection API. Does not work on every device; only enable if Cell Near misbehaves with the default.
+- **Flash Problems** (checkbox). Quickly flashes a brief notice on screen when Tasker hits a problem worth showing. Independent of Popup Errors/Warnings; this is for "something is off" rather than a hard error.
+
+### Other Misc tab toggles (conditional / rarely-shown)
+
+These are also on the Misc tab on most builds but may be hidden on some Android versions or device variants.
+
+- **AI Generation Button Enabled** (checkbox). Shows an AI generation icon on Tasker's main screen so you can open the AI generation flow directly. Even when this is off, you can still get to the AI generation screen by long-pressing the `+` button on the main screen.
+- **NFC Detection Enabled** (checkbox). Lets Tasker react to NFC tags when scanned. Turn off if you keep an NFC tag in your phone case and it triggers Tasker by accident.
+- **Secondary App Enabled** (checkbox). Adds a "Tasker Secondary" icon to your app drawer. Launching that icon fires the "Secondary App Opened" event, which is useful for remapping things like the double-tap-for-camera shortcut or the Bixby button on Samsung devices.
+- **Direct Share Targets Enabled** (checkbox). When on, Share Triggers from your "Received Share" events show up directly as share targets in supported apps. Lets you pick a Share Trigger from the Android share sheet without first picking Tasker and then picking the trigger.
+- **Notify Action Errors** (checkbox). When an action ends in error, Tasker posts a notification about it (unless that action has its own error-handling that suppresses it).
+- **Advanced Export Options** (checkbox). When on, exporting a profile or task description prompts you with advanced format options. Leave off for the standard one-click export.
+- **Compact Exports** (checkbox). Strips non-essential data from XML exports. Smaller files, but you may lose UI-only metadata that helps when reviewing the export by hand.
+- **Check Permissions On Save** (checkbox). When you exit Tasker from the main screen, Tasker scans your configuration and warns about any missing permissions for the actions you use.
+- **Start Monitor On App Open** (checkbox). The monitor service starts immediately when you first open Tasker after a reboot, rather than waiting for the first time a profile would need it.
+- **Accessibility Helps Usage Stats** (checkbox). Lets Tasker's accessibility service also detect the current app even when the App Check Method setting is "Usage Stats". Usually makes app detection faster; turn off only if you see anomalies.
+- **Widget / Shortcut Task Priority** (slider / text). Priority used by tasks launched from a widget tap, an app shortcut tap, or a task picker popup. Higher = preempts more other queued tasks. See Tasker's task scheduling page for the priority rules.
+
+
+Search Tasker (opened from Search Tasker in the overflow menu)
+├── Search field at the top
+├── Filters: Profiles / Tasks / Actions / Variables / Scenes (checkbox row)
+└── Result list
+    └── Tap a result → jumps to that item in the main screen
+
+
+Run Log (opened from Monitoring → Run Log in the overflow menu)
+├── Title bar shows "Run Log"
+├── Filter row with toggle buttons: Profiles, Tasks, Actions
+├── Filter text field with the hint "Filter"
+├── Columns above the list: Time, Status, ID, Details
+├── List of run events (each row shows the time, status icon, ID, and details)
+└── Overflow menu
+    ├── Clear → empties the run log
+    ├── External Viewer → opens the log in a system viewer app
+    ├── Help: This Screen
+    └── Userguide
+```
+
+# Notes on the tree
+
+- Every label above is the text Tasker displays in English. Translations replace those labels in other languages.
+- "+ button (bottom right)" always refers to the floating action button. It is one button; its destination changes per tab.
+- "Long-press" means press and hold for roughly half a second.
+- On the Profiles tab a profile row can be in a collapsed state. While collapsed, the Enter Task entry, the Exit Task entry, and the context icons on the left of the row are not on screen. Tap the profile name to expand the row; tap it again to collapse. Every per-profile long-press target listed under the Profiles tab branch only works while the profile is expanded. If a user says the Add Exit Task entry, the Context Options popup, or the Task Options popup never appears, the most likely cause is that their profile is collapsed; tell them to tap the profile name first.
+- A "contextual action bar at the top" is the temporary toolbar that replaces the title bar when you have one or more list items selected. Tap the back arrow on the left of that bar to exit selection mode.
+- Items marked "only in Beginner Mode" or "not in Beginner Mode" depend on the Beginner Mode setting. New installs default to having Beginner Mode off, so most users see every entry.
+- Items marked "direct distribution only" are extras for users who bought Tasker outside the Play Store. Play Store users do not see them.
+- Items marked "only on Android version X and newer" appear only on Android versions where the underlying capability exists. Tasker hides them on older versions to avoid showing options that cannot work.
+- When the FAB on the Profiles tab launches the Add Context picker, picking Location works two different ways: if you have at least one named location already, Tasker first shows the existing locations and only opens the Location editor when you tap "New Location" at the top of that list.
+- The Application context picker is multi-select. Picking three apps creates a single Application context that matches when any of those three apps is in the foreground.
+- After you configure a context for a brand-new profile and tap Accept, Tasker always prompts for the task. If you cancel the task picker, Tasker offers to delete the unfinished profile rather than leaving a context with no task.
+- The Task editor (called "Task Edit" in the title bar) is reached from many places: tapping a task on the Tasks tab, tapping the linked task on the right side of a profile row, picking "New Task" from a task picker, or following an Add Enter Task / Add Exit Task menu entry from a profile.
+- The Action editor (called "Action Edit") is reached from tapping any action inside the Task editor or from picking an action from the Action picker.
+- The Variable popup is intentionally simple: it is the only way Tasker exposes "set a variable's value by hand from the UI". To rename a variable, long-press it instead.

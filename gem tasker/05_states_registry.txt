@@ -1,0 +1,87 @@
+# Tasker States Registry
+
+This file lists every Tasker states the assistant may reference, grouped by the category users see in the picker.
+Each entry uses the user-visible name, the picker category, a short user-facing description (when present), the user-editable arguments, the output variables it produces, the Android permissions it requires, and any minimum Android version requirement. Empty fields are omitted to keep the file small: a missing `args` means the entry takes no arguments, a missing `outputs` means it produces no output variables, a missing `permissions` means none are required, and a missing `description`, `notes`, `min_android`, `outputs_dynamic`, or `outputs_note` means the same. The `name` and `category` fields are always present.
+All names are exactly as they appear in Tasker. Do not invent states that are not in this file.
+
+===== Name index =====
+
+Every name below is a real Tasker state, spelled exactly as it appears in the app. Use names verbatim: never reorder, abbreviate, translate, or "correct" the words ("Read Binary" is not "Binary Read"; "Variable Set" is not "Set Variable"). If a name you are about to use is not in this list, that state does not exist; do not use it. Do not assume a parallel state exists just because a similar one does.
+
+App: Calendar Entry, Unread Text
+Display: Dark Mode, Display Orientation, Display State, Dreaming
+Hardware: Docked, HDMI Plugged, Headset Plugged, Keyboard Out, Media Button, Pen Menu, Pen Out, USB Connected
+Matter Home Automation: Matter Light (Experimental)
+Net: Airplane Mode, Auto-Sync, BT Connected, BT Near, BT Status, Ethernet Connect, Mobile Network, NFC Status, VPN Connected, Wifi Connected, Wifi Near
+Phone: Call, Cell Near, Missed Call, Signal Strength
+Power: Battery Level, Battery Temperature, Device Idle, Power, Power Save Mode
+Sensor: Any Sensor, Heart Rate, Humidity, Light Level, Magnetic Field, Orientation, Pressure, Proximity Sensor, Sleeping, Temperature
+System: Active User, Custom Setting, Shizuku Available, Work Profile
+Tasker: Profile Active, Task Running
+Variables: Variable Value
+
+===== Category: App =====
+
+```json
+[{"name":"Calendar Entry","category":"App","description":"True while a calendar entry matching the given title is currently in progress.","args":[{"label":"Title","type":"calendar-title"}]},{"name":"Unread Text","category":"App","description":"True while there is at least one unread message of the chosen type.","args":[{"label":"Type","type":"choice","choices":["Any","MMS","SMS"]}]}]
+```
+
+===== Category: Display =====
+
+```json
+[{"name":"Dark Mode","category":"Display","description":"True while system dark mode is enabled."},{"name":"Display Orientation","category":"Display","description":"True while the screen orientation matches the selected value.","args":[{"label":"Is","type":"choice","choices":["Portrait","Landscape"]}]},{"name":"Display State","category":"Display","description":"True while the screen state matches the selected value.","args":[{"label":"Is","type":"choice","choices":["Off","On"]}]},{"name":"Dreaming","category":"Display","description":"True while the device is showing a screensaver (Daydream)."}]
+```
+
+===== Category: Hardware =====
+
+```json
+[{"name":"Docked","category":"Hardware","description":"True while the device is docked in the selected dock type.","args":[{"label":"Type","type":"choice","choices":["Any","Car","Desk","Other"]}]},{"name":"HDMI Plugged","category":"Hardware","description":"True while an HDMI cable is plugged in."},{"name":"Headset Plugged","category":"Hardware","description":"True while a headset of the selected type is plugged in.","args":[{"label":"Type","type":"choice","choices":["Any","Mic","No Mic"]}]},{"name":"Keyboard Out","category":"Hardware","description":"True while a hardware keyboard is open or available."},{"name":"Media Button","category":"Hardware","description":"True while the selected media button is being pressed, optionally only when held down.","args":[{"label":"Button","type":"choice","choices":["Play","Previous","Next","Rewind","Fast Forward","Pause / Stop"]},{"label":"Held Down","type":"yes/no"},{"label":"Grab","type":"yes/no"}]},{"name":"Pen Menu","category":"Hardware","description":"True while the S Pen menu is showing."},{"name":"Pen Out","category":"Hardware","description":"True while the S Pen is removed from the device."},{"name":"USB Connected","category":"Hardware","description":"True while a USB cable of the selected class is connected.","args":[{"label":"Class","type":"choice","choices":["Any","Application Specific","Audio","CDC","Communications","Content Security","Content Smart Card","HID / Keyboard","HID / Mouse","HID / Other","Mass Storage","Wireless Miscellaneous","Per Interface","Physical","Printer","Digital Camera","Vendor Specific","Video","Wireless Controller"]}]}]
+```
+
+===== Category: Matter Home Automation =====
+
+```json
+[{"name":"Matter Light (Experimental)","category":"Matter Home Automation","description":"True while any matching Matter light device is on.","args":[{"label":"Device IDs/Names","type":"text"}],"outputs":[{"name":"%ml_device_id","label":"Device ID","description":"IDs of the devices that were controlled"},{"name":"%ml_device_name","label":"Device Name","description":"Names of the devices that were controlled"},{"name":"%ml_light_on","label":"On","description":"true if the light is on after the action is ran, false otherwise"},{"name":"%ml_light_brightness","label":"Brightness"}]}]
+```
+
+===== Category: Net =====
+
+```json
+[{"name":"Airplane Mode","category":"Net","description":"True while airplane mode is on."},{"name":"Auto-Sync","category":"Net","description":"True while account auto-sync is enabled."},{"name":"BT Connected","category":"Net","description":"True while a Bluetooth device matching the given name or address is connected."},{"name":"BT Near","category":"Net","description":"True while a nearby Bluetooth device of the chosen type (standard or low-energy) is detected.","args":[{"label":"Standard Devices","type":"yes/no"},{"label":"Low-Energy (LE) Devices","type":"yes/no"}]},{"name":"BT Status","category":"Net","description":"True while Bluetooth is in the selected status.","args":[{"label":"Status","type":"choice","choices":["Off","On"]}]},{"name":"Ethernet Connect","category":"Net","description":"True while an Ethernet connection is active."},{"name":"Mobile Network","category":"Net","description":"True while the active mobile data network matches any of the selected types (2G, 3G, 3G HSPA, 4G, 5G).","args":[{"label":"2G","type":"yes/no"},{"label":"3G","type":"yes/no"},{"label":"3G - HSPA","type":"yes/no"},{"label":"4G","type":"yes/no"},{"label":"5G","type":"yes/no"}]},{"name":"NFC Status","category":"Net","description":"True while NFC is in the selected status.","args":[{"label":"Status","type":"choice","choices":["Off","On"]}]},{"name":"VPN Connected","category":"Net","description":"True while a VPN connection is active."},{"name":"Wifi Connected","category":"Net","description":"True while connected to a Wi-Fi network."},{"name":"Wifi Near","category":"Net","description":"True while a Wi-Fi network matching the configured filters is in range."}]
+```
+
+===== Category: Phone =====
+
+```json
+[{"name":"Call","category":"Phone","description":"True while there is a phone call of the chosen type (incoming, outgoing, etc.).","args":[{"label":"Type","type":"choice","choices":["Incoming","Outgoing","Any"]}]},{"name":"Cell Near","category":"Phone","description":"True while the device is near one of the recorded cell towers."},{"name":"Missed Call","category":"Phone","description":"True while there is at least one unacknowledged missed call."},{"name":"Signal Strength","category":"Phone","description":"True while the mobile signal strength (0-4) is within the selected From and To range.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]}]
+```
+
+===== Category: Power =====
+
+```json
+[{"name":"Battery Level","category":"Power","description":"True while the battery percentage is between the selected From and To values.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]},{"name":"Battery Temperature","category":"Power","description":"True while the battery temperature (degrees Celsius) is between the selected From and To values.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]},{"name":"Device Idle","category":"Power","description":"True while the device is in Doze (idle) mode."},{"name":"Power","category":"Power","description":"True while power is connected from the selected source (any, AC, USB, or wireless).","args":[{"label":"Source","type":"choice","choices":["Any","AC","USB","Wireless","Other"]}]},{"name":"Power Save Mode","category":"Power","description":"True while battery saver matches the selected Enabled value.","args":[{"label":"Enabled","type":"yes/no"}]}]
+```
+
+===== Category: Sensor =====
+
+```json
+[{"name":"Any Sensor","category":"Sensor","description":"True while readings from the chosen sensor match the configured conditions, sampled at the chosen interval.","args":[{"label":"Type","type":"text"},{"label":"Interval (ms)","type":"number"},{"label":"Interval Type (Check Help)","type":"choice"}]},{"name":"Heart Rate","category":"Sensor","description":"True while the measured heart rate (bpm) is between the selected From and To values.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]},{"name":"Humidity","category":"Sensor","description":"True while the measured relative humidity (%) is between the selected From and To values.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]},{"name":"Light Level","category":"Sensor","description":"True while the ambient light reading is between the selected From and To values.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]},{"name":"Magnetic Field","category":"Sensor","description":"True while the magnetic field reading on the chosen axis is between the selected From and To values.","args":[{"label":"Axis","type":"choice","choices":["All"]},{"label":"From","type":"number"},{"label":"To","type":"number"}]},{"name":"Orientation","category":"Sensor","description":"True while the device orientation matches the selected value (e.g. face up, face down, standing, etc.).","args":[{"label":"Is","type":"choice","choices":["Face Up","Face Down","Standing Up","Upside Down","Left Side","Right Side"]}]},{"name":"Pressure","category":"Sensor","description":"True while the atmospheric pressure reading is between the selected From and To values.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]},{"name":"Proximity Sensor","category":"Sensor","description":"True while the proximity sensor reports something is close to the device."},{"name":"Sleeping","category":"Sensor","description":"True while the device's sleep detection indicates the user is sleeping at the configured confidence level.","outputs":[{"name":"%sl_confidence","label":"Confidence"},{"name":"%sl_light","label":"Light"},{"name":"%sl_motion","label":"Motion"}]},{"name":"Temperature","category":"Sensor","description":"True while the ambient temperature reading (degrees Celsius) is between the selected From and To values.","args":[{"label":"From","type":"number"},{"label":"To","type":"number"}]}]
+```
+
+===== Category: System =====
+
+```json
+[{"name":"Active User","category":"System","description":"True while the foreground user matches the configured User ID.","args":[{"label":"User ID","type":"number"}]},{"name":"Custom Setting","category":"System","description":"True while the chosen Android system setting holds the specified value.","args":[{"label":"Type","type":"choice","choices":["Global","Secure","System"]},{"label":"Name","type":"text"},{"label":"Value","type":"text"}],"notes":"The Value field is required and cannot be left blank. Enter the exact value the chosen setting must hold for this state to be active."},{"name":"Shizuku Available","category":"System","description":"True while the Shizuku service is running and available."},{"name":"Work Profile","category":"System","description":"True while the work profile is turned on."}]
+```
+
+===== Category: Tasker =====
+
+```json
+[{"name":"Profile Active","category":"Tasker","description":"True while the named Tasker profile is currently active.","args":[{"label":"Name","type":"text"}]},{"name":"Task Running","category":"Tasker","description":"True while the named Tasker task is currently running.","args":[{"label":"Name","type":"task"}]}]
+```
+
+===== Category: Variables =====
+
+```json
+[{"name":"Variable Value","category":"Variables","description":"True while the named variable's value satisfies the chosen comparison against the given value.","args":[{"label":"Name","type":"text"},{"label":"Op","type":"number"},{"label":"Value","type":"text"}]}]
+```

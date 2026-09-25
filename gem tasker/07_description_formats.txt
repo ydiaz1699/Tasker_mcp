@@ -1,0 +1,416 @@
+# Tasker Description Formats
+
+The Gem uses this format whenever it shows you a recipe. The format mirrors Tasker's
+own text export, so users can read it and reproduce the recipe inside Tasker by hand.
+
+These recipes are NOT importable XML. They are written prose the user types into Tasker
+themselves. The Gem must never claim otherwise.
+
+## What this file covers
+
+Two formats are described below: the Task format and the Profile format. Both follow what
+Tasker prints when a user picks "Export" on a Task or Profile. The Gem uses a single-line-per-action
+flattening for chat readability. The real Tasker export wraps each argument onto its own line
+inside the brackets. The Gem collapses each argument onto the same line so that recipes stay
+compact in a chat conversation. The names of actions, arguments, events, states, contexts, and
+profile settings are reproduced verbatim from the app, so the user can find every field in the
+Tasker UI by reading the recipe.
+
+Always cross-reference action, event, and state names with the registries:
+
+- Actions: `03_actions_registry.txt`
+- Events: `04_events_registry.txt`
+- States: `05_states_registry.txt`
+
+If a name is not in the relevant registry, do not use it.
+
+================================================================
+Section 1 - Task format
+================================================================
+
+## Shape
+
+```
+Task: <Task Name>
+A1: <Action Name> [ <Arg Label 1>: <Arg Value 1> <Arg Label 2>: <Arg Value 2> ... ]
+A2: <Action Name> [ <args> ]
+A3: <Action Name> [ <args> ]
+...
+```
+
+If the Task has non-default Task properties, a `Settings: ...` line appears between the `Task:`
+header and the first action.
+
+If the Task has linked comments, a `Comments: ...` line appears between the `Task:` header and
+the `Settings:` line (or directly above the first action when there are no non-default settings).
+
+## Conventions verified against Tasker's export
+
+The following rules describe exactly what Tasker prints. The Gem must follow these rules when
+writing a Task recipe.
+
+- **Task header.** The first line is `Task: <Name>`. If the task is anonymous, the name is
+  replaced by `Anon` (the literal short anonymous label Tasker uses).
+- **Enter / Exit prefix.** When a Task is shown inside a Profile, the task header becomes
+  `Enter Task: <Name>` for the Enter Task and `Exit Task: <Name>` for the linked Exit Task.
+  When a Task is shown standalone (outside a Profile), only `Task: <Name>` is used.
+- **Action numbering.** Every action carries a `A<N>: ` prefix where `N` is the 1-based index
+  of the action in the Task. There is no zero padding. The first action is `A1:`, the tenth is
+  `A10:`, the hundredth is `A100:`. The separator between the number and the action name is a
+  colon followed by a single space.
+- **Disabled action prefix.** A disabled action is rendered with a `[X] ` token between the
+  `A<N>: ` numbering and the action name. The full prefix becomes `A3: [X] Flash`.
+- **Remote action prefix.** An action set to run on a paired remote device gets a `Remote `
+  token between the `A<N>: ` numbering (after the `[X] ` if also disabled) and the action name.
+  The full prefix becomes `A4: Remote Notify`.
+- **Action label.** When an action has a user-defined label, the label is rendered on its own
+  line directly above the action, wrapped in literal angle brackets. The format is
+  `<my label>`. The label uses the same indentation as the action it labels. Labels with
+  embedded newlines are indented on each continuation line.
+- **Action body.** After the prefix and the action name, the body is `<Action Name> [ <args> ]`.
+  When the action has no arguments, the brackets are omitted entirely and the line ends with
+  just the action name (for example, `A2: End If`).
+- **Argument list.** Each argument inside the brackets is `<Arg Label>: <Arg Value>`. Empty
+  arguments are skipped (they do not print as `*` or any other placeholder). Arguments are
+  separated from each other by a single space when the Gem flattens them onto one line. In
+  the real Tasker export each argument starts on a new line inside the brackets; the Gem
+  drops those newlines for chat readability.
+- **Condition tail.** When an action has its own `If` condition (the per-action condition
+  configured by tapping the action's left edge in the editor), the condition is rendered after
+  the closing `]` of the argument list. The format is ` [ <condition> ]`. For every action
+  that is itself not an `If` action, the literal token `If ` is prepended before the opening
+  `[`. So a `Flash` action with condition `%x ~ hello` reads:
+  `A1: Flash [ Text: hi ] If  [ %x ~ hello ]`. For an actual `If` action that already starts
+  with the word `If`, the prefix is not duplicated and the condition tail reads simply
+  `[ <condition> ]`.
+- **Continue Task After Error.** When the action has Continue Task After Error switched on,
+  the argument list gains a final entry that reads `Continue Task After Error:On` right before
+  the closing `]`.
+- **Control-flow indentation.** Tasker increases indentation by four spaces every time an `If`,
+  `Else`, or `For` action opens a new block, and decreases by four spaces on `End If`, `End For`,
+  and `Else`. The `If`, `Else`, `End If`, `For`, and `End For` actions themselves render at the
+  outer indentation level. The actions inside the block render at the inner indentation level.
+- **Settings line.** When the Task has non-default Task properties, a `Settings: <body>` line
+  appears above the first action. The body lists only the properties that differ from the
+  default. Possible entries inside the body are:
+  - `Settings: <repeat type>` when the repeat type is not the default. (The repeat type is
+    only set when the Task is invoked by a Time context.)
+  - `Task Stay Awake` when Stay Awake is enabled on the task.
+- **Comments line.** When the Task carries user-typed comments, the line `Comments: <text>`
+  appears between the `Task:` header line and the `Settings:` line (or directly above the
+  first action when there are no non-default settings).
+- **Truncation marker.** When more actions exist beyond the renderer's maximum (the Gem does
+  not truncate, but Tasker may in small contexts), a trailing `    ...` line indicates more
+  actions follow.
+- **Trailing newlines.** Each action is followed by a blank line, so actions are visually
+  separated in the export. The Gem may collapse blank lines between actions to keep recipes
+  compact.
+
+## Single-line flattening note
+
+The Gem flattens every action onto a single line. Tasker's real export inserts a newline before
+each argument inside the `[ ... ]` brackets. Both forms describe the same action and produce
+the same behaviour when the user types the values into the editor. The Gem chose the flattened
+form because it keeps recipes short in chat conversation. Always tell the user that this is the
+Gem's compact form when they ask why their own Tasker screen looks different.
+
+================================================================
+Section 2 - Profile format
+================================================================
+
+## Shape
+
+```
+Profile: <Profile Name>
+<Context 1 prefix>
+    <Context 1 args summary>
+<Context 2 prefix>
+    <Context 2 args summary>
+
+Enter Task: <Task Name>
+A1: <Action Name> [ <args> ]
+A2: <Action Name> [ <args> ]
+...
+
+Exit Task: <Task Name>
+A1: <Action Name> [ <args> ]
+...
+```
+
+## Conventions verified against Tasker's export
+
+- **Profile header.** The first line is `Profile: <Name>`. If the profile is anonymous, the
+  name is replaced by `Anon`.
+- **Settings line.** When the Profile carries non-default settings, a `Settings: <body>` line
+  follows the header line. The body is a single line that concatenates only the entries that
+  differ from the default. Possible entries are:
+  - `Cooldown: <seconds>` when a cooldown is set.
+  - `Priority: <n>` when the priority is non-default.
+  - `Restore: yes` when the profile is configured to restore prior settings on exit.
+  - `Enforce: no` when task-order enforcement is disabled.
+  - `Notification: no` when the profile is configured not to appear in the active notification.
+  Entries are separated by a single space, so a busy settings line reads
+  `Settings: Cooldown: 30 Priority: 5 Restore: yes`.
+- **Comments line.** When the Profile carries user-typed comments, the line `Comments: <text>`
+  appears between the profile header and the contexts block (or between the settings line and
+  the contexts block, when both are present).
+- **Contexts block.** The contexts that make up the trigger half of the profile appear one per
+  line, in the same order the user added them to the profile. Each line starts with a single
+  tab character of indentation, followed by the context type label and a colon-and-space,
+  followed by the context summary. There is no literal `Context:` umbrella prefix.
+- **Context type labels.** Tasker prefixes every context with the type label and a colon. The
+  labels are: `Application:`, `Time:`, `Day:`, `Location:`, `State:`, `Event:`.
+- **Multiple contexts.** When a Profile has more than one context, each context renders on its
+  own line. There is no literal `AND` or `OR` word between context lines. Tasker combines
+  multiple contexts on the same profile with AND, but the export does not spell that out.
+  The Gem may add a one-line note above the contexts block explaining the AND combination when
+  helpful, but the bare format itself does not include the word.
+- **Enter Task block.** Always present. The Enter Task header reads `Enter Task: <Name>`, and
+  the actions render exactly as described in Section 1.
+- **Exit Task block.** Present only when the user linked an Exit Task to the profile. The
+  header reads `Exit Task: <Name>` and the actions render the same way.
+- **Blank lines.** Tasker separates the contexts block from the Enter Task block with a blank
+  line, and separates the Enter Task block from the Exit Task block with a blank line.
+
+## Per-context shape
+
+Each context type uses a different summary format inside its line.
+
+### Application context
+
+The line reads `Application: <App1>, <App2>, <App3>`. Up to three app labels print before the
+list is truncated with `...`. When the context is inverted (matches while the apps are NOT in
+the foreground), the literal word `Not` precedes the list:
+`Application: Not Google Chrome`. When the context also matches background services, a
+`, Services` (or `, App/Services` if foreground apps are included too) entry is appended.
+
+### Time context
+
+The line reads `Time: <from-clause> [<repeat-clause>] [<till-clause>]`. Tasker prints whichever
+pieces are configured:
+
+- `From <HH:MM>` for the start time.
+- `every <n>h` or `every <n>m` for the repeat interval (the unit follows the user's choice).
+- `Till <HH:MM>` for the end time.
+
+Examples produced by Tasker:
+
+- `Time: From 09:00 Till 17:30`
+- `Time: From 22:00 every 15m`
+- `Time: every 1h Till 23:59`
+
+### Day context
+
+The line reads `Day: <days>`. The body is a natural-language list of the configured weekdays,
+days of the month, and months, with commas between entries, an `or` before the last entry,
+and `the` / `of` / `in` connectors between sections.
+
+Examples produced by Tasker:
+
+- `Day: Mon, Wed or Fri`
+- `Day: the 1st or the 15th of Jan, Apr, Jul or Oct`
+- `Day: Sat or Sun in Jun, Jul or Aug`
+
+### Location context
+
+The line reads `Location: <latitude> / <longitude> / <radius>m`. The radius is always followed
+by the lowercase letter `m`. Example: `Location: 51.5074 / -0.1278 / 200m`.
+
+### Event context
+
+The line reads `Event: <Event Name> [ <Arg Label>:<Arg Value> ... ]`. Arguments are wrapped
+in `[ ... ]` brackets and joined by single spaces. Empty arguments print as `*`. If the
+event was configured with `Stop Event` set to On, the entry `Stop Event:On` appears inside
+the brackets. If the event carries a per-event condition, the condition follows after the
+closing bracket inside its own pair of brackets: `... ] [ %x ~ hello ]`.
+
+### State context
+
+The line reads `State: <State Name> [ <Arg Label>:<Arg Value> ... ]`. Same bracket and argument
+rules as Event. When the state is inverted (matches while NOT in the state), the literal word
+`Not` precedes the state name: `State: Not Wifi Connected`. If the state carries a per-state
+condition, it follows after the closing bracket the same way Event does.
+
+================================================================
+Section 3 - Worked examples
+================================================================
+
+The examples below show recipes in the compact one-line-per-action style the Gem prints. Each
+example uses real action, event, state, and context names cross-checked against the registries.
+
+---
+
+## Example 1 - Profile with a Wi-Fi state context
+
+A Profile that turns on Do Not Disturb while the device is connected to any Wi-Fi network.
+
+```
+Profile: Quiet on Wi-Fi
+    State: Wifi Connected
+
+Enter Task: Go Quiet
+A1: Flash [ Text: Wi-Fi connected, going quiet ]
+A2: Vibrate On Notify [ Set: Off ]
+```
+
+---
+
+## Example 2 - Profile with a Time context
+
+A Profile that runs a "Good Morning" task every weekday at 07:00.
+
+```
+Profile: Morning Greeting
+    Time: From 07:00 Till 07:01
+
+Enter Task: Good Morning
+A1: Say [ Text: Good morning ]
+A2: Popup [ Title: Today Text: Check your calendar ]
+```
+
+---
+
+## Example 3 - Profile with an Application context
+
+A Profile that lowers media volume while the YouTube app is in the foreground.
+
+```
+Profile: Quiet YouTube
+    Application: YouTube
+
+Enter Task: Lower Volume
+A1: Flash [ Text: YouTube open, lowering volume ]
+```
+
+---
+
+## Example 4 - Profile with a Location context
+
+A Profile that turns Wi-Fi on whenever the device is inside a 150-meter circle around home.
+
+```
+Profile: At Home Wi-Fi
+    Location: 40.7128 / -74.0060 / 150m
+
+Enter Task: Wi-Fi On
+A1: WiFi [ Set: On ]
+```
+
+---
+
+## Example 5 - Profile with an Event context (text received)
+
+A Profile that flashes the screen with the sender and body whenever a text message arrives.
+
+```
+Profile: Text Alert
+    Event: Received Text [ Type:Any Content:* SIM Card:* MMS Body:* ]
+
+Enter Task: Show Text
+A1: Flash [ Text: Got a message from %SMSRF ]
+```
+
+---
+
+## Example 6 - Profile with a State that has multiple args
+
+A Profile that pops up a low-battery warning whenever battery level falls between 0% and 15%.
+
+```
+Profile: Battery Low Warning
+    State: Battery Level [ From:0 To:15 ]
+
+Enter Task: Warn Low Battery
+A1: Popup [ Title: Battery Low Text: Plug in soon ]
+```
+
+---
+
+## Example 7 - Task with action conditions
+
+A standalone Task that flashes one of two messages based on the current battery level. Each
+of the two `Flash` actions carries a per-action `If` condition tail.
+
+```
+Task: Battery Check
+A1: Flash [ Text: Battery is high ] If  [ %BATT > 50 ]
+A2: Flash [ Text: Battery is low ] If  [ %BATT <= 50 ]
+```
+
+---
+
+## Example 8 - Task with action labels
+
+A Task with user-defined labels above two of its actions. Labels appear in angle brackets on
+their own lines, directly above the action they describe.
+
+```
+Task: Morning Routine
+<start of day>
+A1: Say [ Text: Good morning ]
+A2: WiFi [ Set: On ]
+<weather popup>
+A3: Popup [ Title: Weather Text: Sunny, 18 degrees ]
+A4: Flash [ Text: Routine done ]
+```
+
+---
+
+## Example 9 - Task with If / End If indentation
+
+A Task that uses an `If` block. Actions inside the block are indented by four spaces. The
+`If` and `End If` actions themselves render at the outer indentation level.
+
+```
+Task: Maybe Notify
+A1: If [ %lang ~ en ]
+A2:     Flash [ Text: Hello ]
+A3:     Notify [ Title: Heads up Text: English speaker detected ]
+A4: End If
+A5: Flash [ Text: Done ]
+```
+
+---
+
+## Example 10 - Profile with both Enter and Exit tasks
+
+A Profile that turns Do Not Disturb on while the headset is plugged in and turns it back off
+when the headset is unplugged. Demonstrates the Exit Task block.
+
+```
+Profile: Headset Quiet
+    State: Headset Plugged
+
+Enter Task: Quiet On
+A1: Vibrate On Notify [ Set: Off ]
+A2: Flash [ Text: Headset connected ]
+
+Exit Task: Quiet Off
+A1: Vibrate On Notify [ Set: On ]
+A2: Flash [ Text: Headset disconnected ]
+```
+
+================================================================
+Section 4 - Reading checklist for the Gem
+================================================================
+
+When the Gem builds a recipe for the user it should walk through this checklist:
+
+1. Pick real action, event, and state names from the registries. Never invent names.
+2. Use only argument labels that appear in the registry entry for that action, event, or state.
+3. Number actions starting from `A1:`, with no zero padding.
+4. Indent four spaces per open `If`, `Else`, or `For` block. The opening and closing actions
+   themselves render at the outer indentation level.
+5. Wrap user-defined action labels in `<...>` on their own lines above the action.
+6. Place per-action condition tails after the closing `]` of the argument list, with the
+   literal token `If ` prepended for non-`If` actions.
+7. For Profiles, render contexts as `<TypeLabel>: <summary>` indented with a single tab, one
+   per line, with no umbrella `Context:` prefix and no literal `AND`/`OR` between them.
+8. Always include the `Enter Task:` block. Include the `Exit Task:` block only when one is
+   linked.
+9. Add the Settings line only when the Profile or Task carries non-default properties.
+10. When in doubt, leave a piece out rather than guessing.
+
+The Gem must remind the user that the printed recipe is a written description, not an
+importable file. The user reproduces it by tapping through the Tasker UI and entering the
+values shown.

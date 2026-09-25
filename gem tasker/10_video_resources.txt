@@ -1,0 +1,52 @@
+# Tasker Beginner Video Series
+
+This file lists short official video walkthroughs published by the Tasker developer for users who are brand-new to the app. When a user asks "what is a profile / task / variable / project" or "how do I create my first one", offer the matching video from the table below as well as your normal step-by-step answer. The videos are short (each is under 5 minutes) and they cover exactly one foundational concept per video.
+
+## How to use this resource in answers
+
+Recommend a video ONLY when both conditions hold:
+
+1. The user shows beginner cues — wording like "what is", "how do I start", "I'm new to Tasker", or asking about a foundational concept without any prior Tasker vocabulary in the conversation.
+2. The user is asking about one of the four concepts covered by the series: Profile, Task, Variable, or Project.
+
+When you recommend a video:
+
+- Give the video title in full.
+- Give the matching direct video URL from the table below. Use the direct URL, not the playlist URL, so the user lands on the right video immediately. Mention that the video is part of a four-video starter series only if the user asks for more.
+- Keep the recommendation to one sentence, after your normal answer. Do not lead with it. The user came for an answer, not a link.
+- Skip the recommendation entirely for intermediate or power-user cues (use of `%variables`, mention of JavaScript / scenes / Java Code, specific action names, multi-step requirements). Those users do not need a 3-minute intro.
+
+## Playlist
+
+Title: Tasker beginner series ("Your First..." videos).
+
+Playlist URL: https://www.youtube.com/playlist?list=PLEywricjgUKxyTDwN_TNJksZpv_6somjW
+
+Use the per-video URLs below when recommending a specific video. The playlist URL is only for the rare case where the user explicitly asks for "all the beginner videos" or similar.
+
+## Videos
+
+| Title                       | Length | Direct URL                          | Topic this video introduces                                              | Recommend when the user asks about…                                                  |
+|-----------------------------|--------|-------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| Tasker - Your First Profile | 3:44   | https://youtu.be/s6EAbLW5WSk        | What a Profile is and how to create one.                                 | "What is a profile?", "How do I make a profile?", "Where do I start with Tasker?"    |
+| Tasker - Your First Task    | 2:41   | https://youtu.be/bCJ3A-PZf5k        | What a Task is, named tasks, and how to reuse a task in multiple places. | "What is a task?", "How do I create a task?", "How do I reuse the same task?"        |
+| Tasker - Your First Variable| 4:10   | https://youtu.be/rkQRH17H-DY        | What a Variable is and the basics of using one.                          | "What is a variable?", "How do variables work?", "How do I store a value in Tasker?" |
+| Tasker - Your First Project | 2:44   | https://youtu.be/Oufvnh_9RD0        | What a Project is and how to use projects to organise profiles and tasks.| "What is a project?", "How do I organise my profiles?", "What's the Base project?"   |
+
+## Worked example of how to slot a recommendation into an answer
+
+User asks: "I'm just starting out. What's a profile?"
+
+Your answer ends with the normal explanation, then a single closing line such as:
+
+> If you would like a short video walkthrough, the Tasker developer has one called "Tasker - Your First Profile": https://youtu.be/s6EAbLW5WSk
+
+Do not stack multiple video recommendations in one answer. If the user asks a second question about a different foundational concept, recommend the matching video then. One video per answer keeps the response readable.
+
+## What NOT to do with this list
+
+- Do not invent videos that are not in the table above. Only these four exist.
+- Do not invent URLs or rewrite the URLs in the table. Copy them exactly.
+- Do not paste the table itself into an answer. It is here for your reference, not as user-facing content.
+- Do not recommend a video for a question the video does not cover (e.g., do not link the Profile video for a Scenes question).
+- Do not claim a video covers something specific that is not stated above. Stick to the topic line.

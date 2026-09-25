@@ -1,0 +1,390 @@
+# Contexts, Variables, and Scenes
+
+This file is the long-form reference for the trigger half of a Profile (Contexts), for Tasker's variable system, and for the Scene builder. The Actions Registry, Events Registry, and States Registry cover the rest. The Gem must treat the tables here as the source of truth and must never invent a built-in variable name, a context type, or a Scene component that is not listed here.
+
+===== Section 1: Context types =====
+
+A Context is the trigger half of a Profile. Tasker offers six context categories from the `+` menu on the Profiles tab. Four of them have their own dedicated argument structure (Application, Time, Day, Location). The other two (Event and State) are large families that open onto a picker of choices. Multiple Contexts on the same Profile combine with AND. The Profile is active only when every Context is active at the same time. To express OR, build two Profiles that share the same Enter Task.
+
+## Application
+
+Matches while one of the chosen apps is in the foreground. You build the Context by ticking apps in a picker. Tasker matches the active app, the active activity inside that app, or, optionally, services that the app exposes.
+
+Argument structure:
+
+- A list of one or more apps. Each entry is a single app on the device. You can pick several at once and the Context is active when any one of them is foreground.
+- A "Services" toggle. When enabled, Tasker also matches the Context if a chosen app is running a background service. The toggle defaults to off.
+
+Example in description format:
+
+```
+Profile: Driving Mode
+    Application: Maps or Spotify
+    Enter Task: Loud Volume
+```
+
+## Time
+
+Matches inside a clock time window or on a recurring interval inside that window. Time wraps past midnight, so a window like `From 22:00 Till 06:00` is valid and active overnight.
+
+Argument structure:
+
+- From. A clock time in HH:MM, or empty (no lower bound, treated as the start of the day when paired with a Day context). May also be a variable that resolves to HH:MM.
+- To. A clock time in HH:MM, or empty (no upper bound, treated as the end of the day). May also be a variable.
+- Repeat. Optional. A number plus a unit of Hours or Minutes. When set, the Context briefly activates at every step inside the From/To window, instead of staying active for the whole window.
+- If only From is set, the Context activates at that exact minute. If only To is set, the Context is active from midnight until To. If both are set with no Repeat, the Context stays active for the whole window. If both are set with Repeat, the Context fires once at each step inside the window.
+
+Example in description format:
+
+```
+Profile: Hourly Reminder
+    Time: From 09:00 Till 17:00 every 1h
+    Enter Task: Stand Up
+```
+
+## Day
+
+Matches on the chosen days of the week, days of the month, and/or months of the year. The Context is active for the whole calendar day on a match.
+
+Argument structure:
+
+- Days of Week. Any subset of Sun, Mon, Tue, Wed, Thu, Fri, Sat. Empty means "any day of the week".
+- Days of Month. Any subset of the 1st through the 31st, plus a special "Last" choice for the final day of the month (handles 28/29/30/31 variability). Empty means "any day of the month".
+- Months. Any subset of Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec. Empty means "any month".
+
+When more than one of these groups is set, the Context only matches when every group's condition is met (the groups themselves combine with AND, the choices inside each group combine with OR).
+
+Example in description format:
+
+```
+Profile: Weekday Mornings
+    Day: Mon, Tue, Wed, Thu or Fri
+    Time: From 07:00 Till 08:00
+    Enter Task: Wake Up
+```
+
+## Location
+
+Matches while the device is inside a chosen radius around a chosen point. Tasker reads from one or both of the device's location providers and checks whether the device sits inside the circle.
+
+Argument structure:
+
+- Latitude and Longitude. The centre of the circle. You usually set them by tapping a map screen inside Tasker. Both values support the standard decimal format.
+- Radius. The radius of the circle in metres. Default 150 metres. Smaller radii react more sharply but bounce more on weak signals. Larger radii are more reliable but trigger earlier.
+- GPS and Net toggles. Two independent checkboxes that select which providers Tasker is allowed to use to evaluate the Context. GPS is more accurate but uses more battery and needs an outdoor view of the sky. Net (Cell + Wi-Fi) is much cheaper and works indoors but is less precise. By default both are on. You can turn one off if you only want one provider.
+
+Example in description format:
+
+```
+Profile: At Home
+    Location: 38.7223, -9.1393, 150m, GPS+Net
+    Enter Task: Wi-Fi On
+```
+
+## Event
+
+The Event category is a large family of instant triggers. An Event fires at one moment in time and the Profile re-enters every single time the chosen Event fires while the other Contexts on the Profile are also active. Examples include SMS Received, New Photo, Notification, Shake, Alarm Done, Power Connected, Variable Set, and many more. The argument structure of each Event is specific to that Event (an SMS Received Event lets you filter by sender; a Notification Event lets you filter by app; a Variable Set Event lets you filter by variable name). The full list, with each Event's arguments, outputs, and required permissions, lives in the Events Registry (file 04).
+
+## State
+
+The State category is a large family of duration triggers. A State is either active or inactive at any moment, and stays active for the whole duration of the underlying condition. Examples include Phone Ringing, Charging, Headset Plugged, Battery Low, Wi-Fi Connected, Bluetooth Connected, Display State, and many more. Like Events, each State has its own argument structure (a Wi-Fi Connected State lets you filter by SSID; a Variable Value State lets you set a comparison). The full list lives in the States Registry (file 05).
+
+## Combining contexts
+
+A Profile may have up to one Application Context, one Time Context, one Day Context, one Location Context, and up to several State and Event Contexts. They combine with AND. A Profile with an Event Context is sometimes called an event profile (it fires every time the Event fires while the other Contexts hold). A Profile with only States is sometimes called a state profile (it enters once when all States are simultaneously active and exits when any of them stops being active). A Profile that mixes a State and an Event re-enters each time the Event fires while the State is active.
+
+===== Section 2: Variables =====
+
+A Variable is a named holder for a piece of text, a number, an array, or a JSON object. Every Variable name starts with `%`. The first character after the `%` defines the variable's scope.
+
+## Naming rules
+
+- A Variable name with **at least one lowercase letter** anywhere in the name is **local**. Local variables are scoped to one Task. They appear when the Task starts, hold values while the Task runs, and disappear when the Task ends. Examples: `%count`, `%myValue`, `%xVar`, `%sum1`.
+- A Variable name made of **only uppercase letters and digits** after the `%` is **global**. Global variables persist across Tasks, across Profiles, across reboots, and across the whole device. They stay until you clear them or overwrite them. Examples: `%MYTOTAL`, `%LASTRUN`, `%COUNTER1`.
+- A Project Variable is a global-style name (all caps) created from inside a Project's Variables tab. It is visible to the Tasks inside that Project, and only those Tasks.
+- A **built-in variable** is a global, read-only name that Tasker keeps up to date on your behalf. Built-in names are listed in the table below. Do not overwrite them and do not invent new ones.
+
+Names are case-sensitive in the sense that uppercase-vs-lowercase changes the scope. `%MyVar`, `%myvar`, and `%MYVAR` are three different variables (the first two are local, the third is global).
+
+## Storing and reading values
+
+You set and read Variables from the Variables category of the action picker. The full list with arguments and outputs is in the Actions Registry (file 03). The most-used names are:
+
+- Variable Set. Sets a Variable to a literal value, the result of a math expression, or the value of another Variable.
+- Multiple Variables Set. Sets several Variables in one Action. Put the names in the Names field and the matching values in the Values field. You can also leave the Values field empty and write one `name=value` pair per line directly in the Names field, with the Values Splitter set to `=` (or any character that cannot appear in a Variable name); each line is then split into a name and its value.
+- Variable Add and Variable Subtract. Numerical arithmetic on a Variable.
+- Variable Clear. Removes a Variable. The next read returns the literal name (e.g. `%FOO`) instead of an empty string, unless the Variable was never set.
+- Variable Search Replace. Find/replace with a regular expression. Can also capture groups into a numbered array.
+- Variable Split, Variable Join, Variable Section. Cut a Variable up by a separator, glue an array back together, or slice out a section.
+- Variable Convert. Format a Variable as bytes, kilobytes, Base64, MD5, SHA-1, lowercase, uppercase, and similar conversions.
+- Variable Randomize. Pick a random whole number into a Variable.
+- Test Variable. Read a property of a Variable into a destination Variable (length, type, value, and similar).
+
+To reference a Variable inside another Action's text field, type the name with the `%` prefix. Tasker expands it at the moment the Action runs.
+
+## Structured (JSON) variables
+
+A Variable can hold a JSON object or a JSON array. The Variables actions that produce or consume JSON include:
+
+- JavaScriptlet and JavaScript. Run a JavaScript snippet whose variables become structured variables of the same name when the script finishes.
+- HTTP Request. Stores a JSON response body as a structured variable when the response content type says JSON.
+- Set Variable Structure Type. Forces an existing Variable to be parsed as JSON, XML, HTML, or auto-detected, so that dot/bracket access works.
+
+Access elements with dot notation, mixed with the `(N)` array syntax:
+
+```
+%RESPONSE.items(1).name
+%RESPONSE.items(2).price
+%RESPONSE.user.address.city
+```
+
+The same dot syntax works for nested JSON objects of any depth. `()` indexes into arrays inside the JSON.
+
+## Array variables
+
+A Variable name followed by `(N)` is an array element. Tasker treats `%MYARR(1)`, `%MYARR(2)`, `%MYARR(3)` as elements of an array named `%MYARR`. Array indices start at 1, not 0.
+
+Special index forms:
+
+- `%MYARR(#)` is the count of currently defined elements.
+- `%MYARR(#>)` is the index of the first defined element.
+- `%MYARR(#<)` is the index of the last defined element.
+- `%MYARR(>)` is the first defined element's value.
+- `%MYARR(<)` is the last defined element's value.
+- `%MYARR(*)` is a random defined element.
+- `%MYARR(+)` is every defined element joined together.
+- `%MYARR(#?value)` is the index of the first element whose value equals `value`.
+- `%MYARR($value?)` is the value of an element matched by a query expression.
+- `%MYARR(1,3,5)` is a comma-separated list of indexed values.
+
+Dedicated array Actions (full details in the Actions Registry, file 03):
+
+- Array Set. Assigns the elements of an array from a delimited string.
+- Array Push. Adds an element to the start or end of an array, with optional padding to a fixed length.
+- Array Pop. Removes and returns an element from a chosen position.
+- Array Clear. Removes every element of the array.
+- Array Compare. Compares two arrays.
+- Array Process. Sort, shuffle, reverse, remove duplicates, remove blanks, or squash an array.
+- Arrays Merge. Combine several arrays into one.
+
+## Built-in variables
+
+Every entry below is a global, read-only Variable that Tasker keeps up to date for you. Use them in any Action text field, any Context comparison, or any Task condition. Do not assign to them yourself. This table is the source of truth: do not invent variable names that are not on this list.
+
+| Variable | Description |
+| --- | --- |
+| `%AIR` | Whether Airplane Mode is currently on. |
+| `%AIRR` | Comma-separated list of radios that Airplane Mode is currently turning off. |
+| `%BATT` | Current battery level as a percentage (0 to 100). |
+| `%BLUE` | Current Bluetooth on/off status. |
+| `%CALS` | List of calendars available to read or write. |
+| `%CALTITLE` | Title of the calendar event matched by the current Calendar Entry context or Action. |
+| `%CALDESCR` | Description of the calendar event matched by the current Calendar context or Action. |
+| `%CALLOC` | Location field of the calendar event matched by the current Calendar context or Action. |
+| `%CDATE` | Date the last incoming call was received. |
+| `%CNAME` | Caller name of the last incoming call (from contacts). |
+| `%CNUM` | Caller phone number of the last incoming call. |
+| `%CTIME` | Time of day the last incoming call was received. |
+| `%CODATE` | Date the last outgoing call was placed. |
+| `%CODUR` | Duration of the last outgoing call, in seconds. |
+| `%CONAME` | Contact name of the last outgoing call. |
+| `%CONUM` | Phone number of the last outgoing call. |
+| `%COTIME` | Time of day the last outgoing call was placed. |
+| `%CELLID` | Current cell tower identifier. |
+| `%CELLSIG` | Current cell signal strength. |
+| `%CELLSRV` | Current cell service state. |
+| `%CLIP` | Current clipboard contents (text). |
+| `%CPUFREQ` | Current CPU clock frequency. |
+| `%CPUGOV` | Current CPU governor in use. |
+| `%DATE` | Current calendar date. |
+| `%DAYM` | Current day of the month as a number. |
+| `%DAYW` | Current day of the week, by name. |
+| `%DEVID` | Stable identifier for this device. |
+| `%DEVMAN` | Device manufacturer. |
+| `%DEVMOD` | Device model name. |
+| `%DEVPROD` | Internal product name of the device. |
+| `%DEVTID` | Device telephony identifier (when available). |
+| `%BRIGHT` | Current display brightness level. |
+| `%DTOUT` | Current display timeout value. |
+| `%EFROM` | Sender of the last email picked up by the Email Received event. |
+| `%ECC` | Cc field of the last email picked up by the Email Received event. |
+| `%ESUBJ` | Subject of the last email picked up by the Email Received event. |
+| `%EDATE` | Date of the last email picked up by the Email Received event. |
+| `%ETIME` | Time of day of the last email picked up by the Email Received event. |
+| `%MEMF` | Currently free memory in kilobytes. |
+| `%GPS` | Whether the device's GPS receiver is currently enabled. |
+| `%HEART` | Current heart rate reading from the device's heart rate sensor (when available). |
+| `%HTTPR` | HTTP response code from the last HTTP request Action. |
+| `%HTTPD` | Body of the last HTTP response. |
+| `%HTTPL` | Reported length of the last HTTP response. |
+| `%HUMIDITY` | Current ambient humidity from the device's humidity sensor (when available). |
+| `%IMETHOD` | Current input method (keyboard) app. |
+| `%INTERRUPT` | Current interrupt-mode (Do Not Disturb) setting. |
+| `%KEYG` | Whether the lock screen is currently active. |
+| `%LAPP` | Name of the most recently focused app. |
+| `%FOTO` | Path of the most recent photo taken on the device. |
+| `%LIGHT` | Current ambient light reading from the device's light sensor (when available). |
+| `%LOC` | Latest GPS fix as `lat,long`. |
+| `%LOCACC` | Reported accuracy of the latest GPS fix in metres. |
+| `%LOCALT` | Reported altitude of the latest GPS fix in metres. |
+| `%LOCSPD` | Reported speed of the latest GPS fix in metres per second. |
+| `%LOCTMS` | Time (in seconds since the Unix epoch) at which the latest GPS fix was taken. |
+| `%LOCN` | Latest Network (Cell + Wi-Fi) location fix as `lat,long`. |
+| `%LOCNACC` | Reported accuracy of the latest Network fix in metres. |
+| `%LOCNTMS` | Time (in seconds since the Unix epoch) at which the latest Network fix was taken. |
+| `%MFIELD` | Current magnetic field reading from the device's compass sensor. |
+| `%MTRACK` | Title of the currently playing music track. |
+| `%MUTED` | Whether the device's ringer is currently muted. |
+| `%NIGHT` | Whether the device's UI mode is currently set to night. |
+| `%NTITLE` | Title of the most recent notification matched by a Notification event. |
+| `%PNUM` | The device's own phone number. |
+| `%PRESSURE` | Current ambient air pressure from the device's barometer (when available). |
+| `%PACTIVE` | Comma-separated names of the currently active Profiles. |
+| `%PENABLED` | Comma-separated names of currently enabled Profiles. |
+| `%ROAM` | Whether the device is currently roaming on its mobile network. |
+| `%ROOT` | Whether root access is currently available to Tasker on this device. |
+| `%SCREEN` | Current screen state (on, off, or locked). |
+| `%SDK` | Numeric platform version of Android running on the device. |
+| `%SILENT` | Current Silent Mode setting. |
+| `%SIMNUM` | The current SIM card's serial number. |
+| `%SIMSTATE` | Current SIM card state (`ready`, `absent`, `pinrequired`, and similar). |
+| `%SPHONE` | Whether the speakerphone is currently on. |
+| `%SPEECH` | Last spoken phrase recognised by the Get Voice action. |
+| `%TRUN` | Comma-separated names of currently running Tasks. |
+| `%TNET` | Current mobile network operator name. |
+| `%SMSRF` | Phone number the last received SMS came from. |
+| `%SMSRN` | Contact name the last received SMS came from. |
+| `%SMSRB` | Body of the last received SMS. |
+| `%SMSRD` | Date the last SMS was received. |
+| `%MMSRS` | Subject of the last received MMS message. |
+| `%SMSRT` | Time of day the last SMS was received. |
+| `%TEMP` | Current ambient temperature in Celsius from the device's thermometer sensor (when available). |
+| `%TETHER` | Current tethering status. |
+| `%TIME` | Current clock time as `HH.MM`. |
+| `%TIMEMS` | Current time in milliseconds since the Unix epoch. |
+| `%TIMES` | Current time in seconds since the Unix epoch. |
+| `%UIMODE` | Current UI mode (normal, car, desk, etc.). |
+| `%UPS` | Number of seconds the device has been awake since the last boot. |
+| `%VOICE` | Comma-separated results of the last Get Voice prompt. |
+| `%VOLA` | Current Alarm stream volume. |
+| `%VOLC` | Current Call stream volume. |
+| `%VOLD` | Current DTMF stream volume. |
+| `%VOLM` | Current Media stream volume. |
+| `%VOLN` | Current Notification stream volume. |
+| `%VOLR` | Current Ringer stream volume. |
+| `%VOLS` | Current System stream volume. |
+| `%WIFII` | Connection information for the current Wi-Fi network (SSID, BSSID, signal). |
+| `%WIFI` | Current Wi-Fi on/off status. |
+| `%WIMAX` | Current WiMAX on/off status. |
+| `%WIN` | Label of the currently focused window. |
+
+This table is the source of truth. The Gem must not invent built-in variable names. If a user asks for a variable that is not on this list, say so and suggest a Tasker Action that exposes the value they want.
+
+===== Section 3: Scenes (V1) =====
+
+A Scene is a screen that you build inside Tasker and then show, hide, or update from a Task. You design a Scene once in the Scenes tab of the main screen, and call it from your Tasks whenever you need it. You can use a Scene as a heads-up dialog, a custom keyboard, a control panel for your automation, a tutorial walkthrough, or a launcher of your own design.
+
+You build a Scene in the Scene editor. The editor shows a canvas the size of the screen you'll display the Scene on, a palette of components down the side, and a property panel for whatever component you have selected. To add a component you tap it on the palette and drag it onto the canvas. You then size it, name it, and write the Tap, Long Tap, Stroke, Value Selected, Link Click, Page Loaded, and other handler Tasks for it from the component's editor.
+
+A Scene has:
+
+- A name. You reference it from Actions by this name.
+- A target screen orientation.
+- Width and height.
+- Optional background colour or background image.
+- A list of components, each with a position, size, and per-component settings.
+- A set of overlay options (whether it dims the screen, lets touches pass through, runs on top of other apps, fills the status bar, and so on). These are set on the Show Scene Action, not on the Scene itself.
+
+## Component palette
+
+Every component you can place on a Scene canvas:
+
+| Component | Description |
+| --- | --- |
+| Button | Tappable button with a label, an optional icon, and configurable text colour. Common Tap, Long Tap, and Stroke handlers. |
+| Checkbox | Two-state checkbox with a label. Fires Check Change when the user toggles it. |
+| Switch | Two-state slide switch with a label. Fires Check Change when the user toggles it. |
+| Toggle | Two-state visual toggle (a button that looks pressed or unpressed). |
+| Image | Holds a static image from the device, the bundled icon set, an app icon, or a file. |
+| Text | Read-only line of text. Supports HTML formatting and clickable inline links (Link Click handler). |
+| TextEdit | Single-line or multi-line text input field, with optional input filter (numbers, password, date, time, etc.). |
+| Oval | A filled or outlined oval shape, used for decoration or for tap targets. |
+| Rectangle | A filled or outlined rectangle shape, used for decoration or for tap targets. |
+| Doodle | A freehand drawing surface. Captures finger strokes and exposes the result as an image. |
+| Map | A small interactive map. Supports Map Click, Map Long Click, custom markers, and zooming. |
+| Slider | A horizontal or vertical slider with a min, max, and current value. Fires Value Selected when the user releases it. |
+| Number Picker | A scrollable numeric picker with a min, max, and step. |
+| Spinner | A dropdown list of choices. The user picks one of several options. |
+| Menu | A scrolling list of items the user can tap. Each item runs the Menu's Item Click Task (the item's row data is passed to the Task as parameters). Also supports Item Long Click. |
+| WebView | An embedded web browser tile. Loads a URL or raw HTML. Fires Page Loaded and Link Click events, and exposes a JavaScript bridge so code on the page can call a Tasker Task. |
+| Video | Embedded video player. Plays a video file or stream. Fires Video events (started, paused, ended). |
+
+## Driving a Scene from a Task
+
+You operate Scenes from the Scene category of the action picker. Full argument lists for each are in the Actions Registry (file 03). The most-used names:
+
+- Show Scene. Brings the Scene up on the screen. Lets you choose the overlay style (dialog, full-screen activity, overlay on top of other apps, etc.).
+- Hide Scene. Removes the Scene from the screen without destroying it. Tasker remembers the Scene's current values, so a re-Show resumes where you left off.
+- Destroy Scene. Removes the Scene from the screen and clears all its in-memory state. The next Show starts fresh.
+- Create Scene. Pre-builds the Scene in memory without showing it (useful when the first Show needs to be instant).
+- Element Value. Reads or sets the current value of a component (the text inside a TextEdit, the position of a Slider, the choice in a Spinner, etc.).
+- Element Visibility. Shows or hides one component on a Scene that is already on screen.
+- Element Position. Moves a component to a new position on the Scene.
+- Element Size. Resizes a component.
+- Element Text. Sets the text of a Text or Button component.
+- Element Text Colour, Element Text Size. Change the visual style of a text-bearing component.
+- Element Image. Sets the image of an Image, Button, or Map marker.
+- Element Back Colour. Sets the background colour of a component.
+- Element Border. Sets the border of a component.
+- Element Depth. Brings a component forward or sends it back (relative to other components).
+- Element Focus. Moves keyboard focus to a TextEdit, or removes it.
+- Element Destroy. Removes one component from a Scene.
+- Element Create. Adds a new component to an already-running Scene.
+- Element Web Control. Drives a WebView (load a new URL, run JavaScript, scroll, go back, go forward).
+- Element Video Control. Drives a Video component (play, pause, seek).
+- Element Map Control. Drives a Map (set centre, set zoom, add or remove markers).
+- Element Add GeoMarker, Element Delete GeoMarker. Add or remove markers on a Map.
+- Test Element, Test Scene. Read computed properties of a component or the Scene as a whole (current position, size, visibility, depth, value).
+
+## Element parameters
+
+When a Scene fires an interactive event (a Button Tap, a Menu Item Click, a Spinner Item Selected, a Slider Value Selected, a WebView Link Click, a Map Click, and so on), Tasker runs the handler Task and exposes a small set of local variables to it. The most common ones:
+
+- `%element_name`: name of the element the event came from.
+- `%element_type`: type of the element (Button, Slider, Spinner, etc.).
+- `%element_value`: the current value the user picked (the choice in a Spinner, the position of a Slider, the URL clicked in a WebView, the text typed in a TextEdit, etc.).
+- For Menu and List events: the row index and the row's column values are also exposed.
+
+The exact set differs per component and per event. Use them inside the handler Task the same way you use any local variable.
+
+## A note on Scenes V2
+
+Tasker has a second, newer Scene system called Scenes V2, aimed at users who want a more flexible layout engine and more component types. It lives alongside the original scenes and is created from the same Scenes tab, where Tasker offers either a Legacy or a Modern (V2) scene. The original scenes described above are unchanged. Scenes V2 is a separate track with its own actions, and the two systems must not be mixed.
+
+The Element actions, Show Scene, Hide Scene, Destroy Scene, Create Scene, Test Scene, and Test Element actions described above drive the original scenes only. None of them act on a Scene V2 screen.
+
+A Scene V2 screen is driven by its own set of actions, all in the Scene category of the Actions Registry (file 03): Show Scene v2, Dismiss Scene v2, Update Scene v2, Update Scene v2 Overlay, Get Scene v2 Values, Run Scene v2 Action, and Wait For Scene v2 Result. Treat those names and their listed arguments as the source of truth, exactly as the registry spells them. Do not invent a Scene V2 action, display mode, or field.
+
+Show Scene v2 puts a Scene V2 screen up. Its Display Mode argument chooses how it appears: Fullscreen, Fullscreen With Result, Dialog, Dialog With Result, Overlay, Overlay With Result, or Dream. Fullscreen fills the screen like an app. Dialog is a floating window centred on the screen. Overlay floats on top of other apps and can be positioned anywhere. Dream runs the screen as the device screensaver. The three With Result choices pause the task until the screen sends back a result or is dismissed. The other choices show the screen and let the task carry straight on to the next action.
+
+Show Scene v2 also has an Auto Dismiss field, in milliseconds, that closes the screen automatically after the set time. Left at 0 or empty, the screen stays up until something dismisses it. So Scene V2 has a built-in auto-dismiss; you do not need to rebuild that timer by hand.
+
+To get a result back from a screen shown without a With Result display mode, follow it with Wait For Scene v2 Result. That action pauses until the screen is dismissed (or until its own timeout) and returns the screen's output variables. To take a screen down yourself, use Dismiss Scene v2.
+
+To check whether a Scene V2 screen is still on screen, use Get Scene v2 Values. If the screen is no longer shown, whether it was dismissed, auto-dismissed, or never shown, the action ends in error. An error is therefore your signal that the screen is gone. There is no Test Scene action for Scene V2, and the original Test Scene and Test Element actions do not work on Scene V2 screens.
+
+Local variables flow into a Scene V2 screen on their own. Whatever local variables the task holds at the moment Show Scene v2 runs are available inside the screen straight away. Reference one by putting its name, such as %myvar, in any element's field, and the element shows the live value. You do not need to make the variable global, and there is no field on Show Scene v2 for passing variables in.
+
+Once a screen is already up, you can refresh it with the task's current local variables using Update Scene v2 with its Local Variable Passthrough option turned on. Its Limit Passthrough To field narrows that to named variables only.
+
+One element-level limit is worth stating plainly, since it is easy to assume otherwise: the Scene V2 camera element is a live preview only. It can switch between the device's lenses, but it has no built-in way to take a photo. To actually capture a photo, run a task that uses the Take Photo action.
+
+Beyond this, the full Scenes V2 layout-design reference is out of scope for this file. To build a Scene V2 layout from a plain-language description, point the user at the Scenes V2 AI Layout Assistant (see the Built-in AI helpers section of the fundamentals file).
+
+## A note on home screen widgets (Widget v2)
+
+Separate from Scenes, Tasker can build custom home screen widgets with its Widget v2 system. You create and later update one with the Widget v2 action (in the Tasker category). Pick a ready-made layout (Buttons, Media, Circular Image, or Table) or a fully Custom layout, then set the widget's name, background colour, title, texts, images, and the Tasks each part runs.
+
+You add the widget to the home screen the normal Android way: long-press the home screen, choose Widgets, find Tasker's Widget v2, and drop it on. You can also let the action place it for you. Give the widget a name, turn on Ask To Add, and Tasker offers to add it the first time the action runs for a name that is not on the screen yet.
+
+A Custom layout is a structured design made of rows, columns, grids, text, images, buttons, switches, and so on. The easiest way to build one is to let the Tasker AI Automation Generator create it from a plain-language description, rather than writing the layout by hand. The Gem treats the visual layout builder's individual screens as out of scope. It can still say what Widget v2 does, list its presets, and explain how to add it, and it should point the user at the AI Automation Generator for the actual design.

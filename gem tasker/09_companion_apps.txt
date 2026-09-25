@@ -1,0 +1,132 @@
+# Tasker Companion Apps and Tools
+
+This file covers Tasker Settings and Shizuku. They are separate small apps that some Tasker actions delegate to, because Google has restricted what regular apps can do on newer Android versions. When a user asks how to make a restricted action work, send them the relevant section from this file rather than improvising. Hand the user the actual links, the install command, and the post-install gotchas.
+
+The content here mirrors the canonical Tasker Settings README on GitHub and the Shizuku project's own docs. When the corpus is regenerated, both are re-fetched from their source pages.
+
+## Tasker Settings (the companion app)
+
+Tasker Settings is a small helper app made by the Tasker developer. Tasker hands the restricted operations to Tasker Settings, which then performs them because it has the privilege level Tasker itself cannot get.
+
+### Where to get it
+
+GitHub releases page: https://github.com/joaomgcd/TaskerSettings/releases
+
+Pick the **latest** version unless the user has a specific reason to stay on an older one. Newer versions request more permissions; the user can choose the version that covers only the features they need.
+
+### What Tasker uses it for
+
+- **Toggle Wi-Fi.** Regular apps that target Android API 29 and newer cannot toggle Wi-Fi on or off directly. Tasker Settings does it for Tasker.
+- **Connect to a specific Wi-Fi network.** Same restriction. From Tasker Settings 1.8.0 on Android 10 and newer.
+- **Run Shell with restricted commands.** Tasker now targets API 30 and newer, which blocks some shell commands such as `ip neigh`. Enable the "Use Tasker Settings" option on the Run Shell action. Needs Tasker Settings 1.4.0 or newer with Tasker 5.15.6 or newer.
+- **Install an APK file.** Regular apps can no longer hold the install-packages permission. Tasker Settings 1.5.0 or newer installs APK files for Tasker (with Tasker 6.1.7-beta or newer).
+- **Toggle Bluetooth.** Android API 33 and newer blocks regular apps from toggling Bluetooth. Tasker Settings 1.6.0 or newer handles it.
+- **Network Access (per-app internet block).** Tasker Settings 1.7 added this via a VPN service workaround. Needs Tasker 6.2.16-rc or newer.
+- **Toggle Wi-Fi Tether (Hotspot).** Tasker Settings 2.0.0 or newer covers this. On Android 16 and newer, Tasker Settings uses Shizuku internally for the toggle, so the user must install Shizuku as well.
+- **Turn Do Not Disturb off on Android 15 and newer.** Tasker Settings 2.0.0 or newer can do this. Below Android 15, Tasker can do it without Tasker Settings.
+- **Camera disable.** On Android 10 and newer, Tasker's device-admin path can no longer disable the camera on its own. The Camera action falls back to Tasker Settings to do it.
+- **Display Size.** On Android 9 and newer, changing the display density needs Tasker Settings. The Display Size action always routes through Tasker Settings on those versions.
+- **Custom Setting (System namespace only).** The Custom Setting action with the System namespace uses Tasker Settings on Android 6 and newer for keys that are not on Android's public-system-settings whitelist. The Secure and Global namespaces do **not** need Tasker Settings; the WRITE_SECURE_SETTINGS permission (granted via ADB or Shizuku) is enough for those.
+
+### How to install on Android 14 and newer
+
+Google added a target-SDK install block on Android 14. The Play Store will not install Tasker Settings, because it deliberately targets an older SDK (that is the whole point — older targets keep some of the privileges modern apps have lost). Use one of the two methods below.
+
+**Method 1 — via Shizuku (no PC required)**
+
+1. Install Tasker 6.6.11 or newer.
+2. Install Shizuku and complete its setup (see the Shizuku section below).
+3. Inside Tasker, import the "Install APK" task linked from the Tasker Settings GitHub release notes.
+4. Download the Tasker Settings APK from the GitHub releases page.
+5. Run the imported task and pick the APK. Shizuku installs it, bypassing the target-SDK block.
+
+**Method 2 — via ADB from a PC**
+
+1. Download the APK from the GitHub releases page.
+2. Plug the phone into a PC that has the ADB tool installed.
+3. Enable USB debugging in Developer Options on the phone.
+4. From the PC, run:
+
+       adb install --bypass-low-target-sdk-block FILENAME.apk
+
+5. If you get a permission error, also disable "Check apps installed via USB" inside Developer Options on the phone, then retry.
+
+### Below Android 14
+
+You can install the APK like any other sideload — no special command needed.
+
+### Critical setup steps after installing
+
+These bite users repeatedly. Mention them whenever you tell someone to install Tasker Settings.
+
+1. **Grant Tasker Settings's permissions manually, not via the system prompts.** The system prompt sometimes causes Tasker Settings to crash. Instead, open Android Settings → Apps → Tasker Settings → Permissions and grant each permission by hand.
+2. **Exempt Tasker Settings (not just Tasker) from battery optimisation.** Otherwise Tasker may fail to call Tasker Settings in the background. Walkthrough: https://tasker.joaoapps.com/userguide/en/faqs/faq-problem.html#00
+3. **For Do Not Disturb:** open Tasker Settings once and enable DND access from inside.
+4. **For Wi-Fi Tether on Android 16 and newer:** also install and authorise Shizuku, then grant Tasker Settings the Shizuku permission.
+5. **Choose the right version.** Newer Tasker Settings versions request more permissions. Match the version to the features the user actually needs.
+
+### Canonical user-facing message for "how do I get Wi-Fi Tether working?"
+
+The Tasker developer typically sends users a message similar to the following. Adapt it to the user's question; do not invent steps that are not in this file.
+
+> Some features like toggling Wi-Fi Tether cannot be handled directly by Tasker, because of Google's Android restrictions. To work around this, install the Tasker Settings companion app from https://github.com/joaomgcd/TaskerSettings/releases.
+>
+> Make sure to read the full instructions on that page, including the Shizuku part. Pick the version that supports the functionality you need; newer versions request more permissions, so you can choose the one that best fits.
+>
+> Exempt Tasker Settings (not just Tasker) from battery optimisation — instructions: https://tasker.joaoapps.com/userguide/en/faqs/faq-problem.html#00
+>
+> On Android 14 and newer, Tasker Settings must be installed via ADB:
+>
+>     adb install --bypass-low-target-sdk-block FILENAME.apk
+>
+> Alternatively, install it without a PC using Shizuku — see the release notes at the link above for the full walkthrough.
+
+## Shizuku
+
+Shizuku is a separate small app that lets other apps perform privileged operations on Android without rooting the phone. Tasker uses it for a few features that Android otherwise blocks on newer versions.
+
+### Where to get it
+
+- Play Store: search for "Shizuku".
+- Official site: https://shizuku.rikka.app/
+
+### What Tasker uses it for
+
+- Wi-Fi Tether (Hotspot) on Android 16 and newer (the in-process path inside Tasker, and the Tasker Settings 2.0.0+ path).
+- The ADB Wifi action's "via Shizuku" mode, when the user prefers it over wireless ADB pairing.
+- Tasker's Run Shell action when configured to use Shizuku as a privilege source.
+- Installing the Tasker Settings APK on Android 14+ without a PC.
+
+### How to set it up (unrooted phone)
+
+1. Install Shizuku from the Play Store.
+2. Open Shizuku. It offers two ways to start its background service:
+   - **Wireless ADB (Android 11 and newer; no PC):** turn on Developer Options and Wireless debugging in Android settings, then follow Shizuku's pairing flow inside the Shizuku app.
+   - **USB ADB:** plug the phone into a PC with ADB installed and run the start command Shizuku shows you.
+3. Once the service is running, open each app that wants Shizuku access (Tasker and Tasker Settings) and grant it permission from inside the Shizuku app.
+
+Shizuku's service stops when the phone reboots. Restart it the same way after each reboot.
+
+### How to set it up (rooted phone)
+
+Open Shizuku and tap "Start (using root)". That is the whole setup.
+
+## Quick cross-reference
+
+| User question | Companion needed | Version |
+|---|---|---|
+| Toggle Wi-Fi on Android 10+ | Tasker Settings | 1.2.0+ |
+| Connect to a specific Wi-Fi network on Android 10+ | Tasker Settings | 1.8.0+ |
+| Run Shell with restricted commands | Tasker Settings | 1.4.0+ (Tasker 5.15.6+) |
+| Install an APK from a task | Tasker Settings | 1.5.0+ (Tasker 6.1.7-beta+) |
+| Toggle Bluetooth on Android 13+ | Tasker Settings | 1.6.0+ (Tasker 6.2.2-beta+) |
+| Block per-app internet access | Tasker Settings | 1.7+ (Tasker 6.2.16-rc+) |
+| Toggle Wi-Fi Tether (Hotspot) on Android 16+ | Tasker Settings + Shizuku | 2.0.0+ (Tasker 6.6.11+) |
+| Turn Do Not Disturb off on Android 15+ | Tasker Settings | 2.0.0+ (Tasker 6.6.11+) |
+| Disable the Camera on Android 10+ | Tasker Settings | recent version |
+| Change Display Size on Android 9+ | Tasker Settings | recent version |
+| Write a Custom Setting (System namespace) outside the public whitelist | Tasker Settings | recent version |
+
+## Caveat
+
+Android changes and these tools change with it. The versions and requirements above were correct when this corpus was generated. When in doubt, send the user to the latest release notes on the Tasker Settings GitHub page and tell them so explicitly.

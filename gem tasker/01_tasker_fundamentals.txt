@@ -1,0 +1,169 @@
+# Tasker Fundamentals
+
+This file teaches the building blocks of Tasker. Every other knowledge file assumes you know what a Profile, Task, Action, Context, Event, State, Scene, Variable, and Project are. Read this first.
+
+## What Tasker is
+
+Tasker is an automation app for Android. You give Tasker a rule and Tasker watches the phone for the condition you described. When the condition becomes true, Tasker runs a sequence of steps you assembled in advance. The steps can change settings, send messages, show notifications, talk to other apps, manipulate files, store values, build little screens, and more.
+
+You do not write code to use Tasker. You pick from a library of triggers, conditions, and steps inside the app. Power users do dip into JavaScript (the JavaScriptlet and JavaScript actions) and Java reflection (the Java Function and Java Code actions, which call Java classes and methods at runtime). Most users never touch either.
+
+## Getting Tasker
+
+Tasker is paid software. You can buy it from the Google Play Store: https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm
+
+If you want to try Tasker before buying, the developer also offers a free trial. Download it from https://tasker.joaoapps.com/download.html. The trial lets you explore the app before deciding to buy. Point users at this link whenever they ask whether they can try Tasker first, whether there is a free version, or whether they have to pay before testing it.
+
+## Profile
+
+A Profile pairs a condition with a Task. When the condition becomes true, the Enter Task runs. When the condition stops being true, the optional Exit Task runs (if one is linked).
+
+A Profile has:
+
+- A name (you choose it; you can also leave a Profile anonymous).
+- One or more Contexts. Multiple Contexts on the same Profile combine with AND. The Profile is active only when every Context is active.
+- An Enter Task. Required.
+- An Exit Task. Optional. Linked from the same Profile's long-press menu.
+- A toggle to enable or disable the Profile without deleting it.
+
+The Profile lifecycle in user terms:
+
+1. The Contexts all become active. The Profile activates. The Enter Task runs.
+2. While the Profile stays active, additional events that match the Contexts may or may not re-enter the Profile, depending on the Context types (see the Event vs State section below).
+3. One or more Contexts stop being active. The Profile deactivates. If an Exit Task is linked, it runs.
+
+## Task
+
+A Task is an ordered list of Actions. Tasks run top to bottom.
+
+A Task has:
+
+- A name (or none if anonymous). Named Tasks can be called from other Tasks, from widgets, from shortcuts, and from the Run Task action.
+- An optional icon for widgets, shortcuts, and the launcher.
+- A priority. When several Tasks queue up, higher-priority Tasks run sooner.
+- An optional Stay Awake hint that keeps the device awake while the Task runs.
+- A set of Properties accessible from the Task editor's gear icon: priority, lock, label, collision behaviour, and similar.
+
+Inside a Task you can:
+
+- Add Actions from the action picker.
+- Reorder Actions by drag-and-drop.
+- Set per-Action conditions (the `If` tail on a single Action).
+- Use the structured control-flow Actions: `If`, `Else`, `End If`, `For`, `End For`, `Stop`, `Goto`, `Wait`, `Wait Until`.
+- Disable an individual Action without deleting it.
+- Mark an Action as Remote when running on a paired device.
+- Attach a user-defined label to an individual Action.
+
+A Task aborts (hard stop) when:
+
+- A `Stop` Action runs.
+- The user cancels the Task from the Active Tasks screen.
+- The Profile that started the Task gets disabled while the Task is mid-flight (depending on the user's setting).
+
+Aborting is a hard stop, not a graceful one. The Action you were in finishes, and the rest of the Task is skipped.
+
+## Action
+
+An Action is one step inside a Task. Tasker has hundreds of them. They are grouped into categories: Alert, App, Audio, Code, Display, File, Image, Input, Location, Media, Net, Phone, Scene, System, Task, Tasker, Variables, and several more.
+
+Every Action has:
+
+- A name (the label shown in the picker and in the Task list).
+- Zero or more arguments (the fields you fill in: text, numbers, files, apps, choices, etc.).
+- A per-Action `If` condition (optional). Tasker evaluates the condition just before the Action runs. If false, the Action is skipped.
+- A user-defined label (optional). The label appears above the Action in the Task editor and in the description-format export.
+- A disabled toggle. A disabled Action stays in the Task list but is skipped at run time.
+- A Continue Task After Error toggle that lets the Task continue even when the Action reports failure.
+
+Some Actions produce output variables (named `%name`) that hold values from the operation. The Get Location action, for example, sets `%LOC` to the new latitude/longitude when it succeeds. See the Actions Registry for the outputs each Action produces.
+
+## Context
+
+A Context is the trigger half of a Profile. There are six types, picked from the `+` menu on the Profiles tab:
+
+- **Application**: matches while one of the chosen apps is in the foreground.
+- **Time**: matches inside a clock time window or on a recurring interval.
+- **Day**: matches on the chosen days of the week or days of the month.
+- **Location**: matches while the device is inside a chosen radius around a point (or a chosen Wi-Fi cell / network).
+- **Event**: matches the moment a chosen event fires (an instant trigger).
+- **State**: matches while a chosen condition holds (a duration trigger).
+
+Multiple Contexts on the same Profile combine with AND. To express OR, use two Profiles with the same Enter Task.
+
+## Event vs State
+
+The difference between Event and State is the difference between a click and a hold.
+
+- An **Event** fires once at an instant. Examples: SMS Received, New Photo, Notification, Shake, Alarm Done. When an Event fires, the Profile re-enters every single time the Event fires while the other Contexts on the Profile are also active. Each fire runs the Enter Task once.
+- A **State** lasts for a duration. Examples: Phone Ringing, Charging, Headset Plugged, Battery Low. The State is either active or inactive at any moment. When all of a Profile's Contexts (including its States) become active together, the Profile enters and the Enter Task runs once. When any of them stops being active, the Profile exits.
+
+If a Profile mixes a State and an Event, the Profile re-enters each time the Event fires *while* the State is active.
+
+## Scene
+
+A Scene is a user-built screen you draw inside Tasker. You add components: Buttons, Text labels, Edit Text inputs, Images, Maps, Web views, shapes, sliders, toggles, number pickers, and more. You wire components to Tasks (a Button tap can run a Task; a Slider value-change can run a Task).
+
+You show, hide, and update Scenes with the Scene category Actions: Show Scene, Hide Scene, Destroy Scene, Element Value, Element Visibility, Element Position, and so on.
+
+Scenes live in the Scenes tab. Each Scene belongs to a Project.
+
+The Gem covers Scenes V1 in detail. Tasker also has a newer Scenes V2 system available to power users; the Gem mentions it only when asked specifically.
+
+## Variable
+
+A Variable is a named value with a `%` prefix. Variables hold text, numbers, or structured data.
+
+- **Local variables**: names that contain at least one lowercase letter (for example `%count`, `%myValue`). Scoped to one Task. Disappear when the Task finishes.
+- **Global variables**: names in all uppercase (for example `%MYTOTAL`). Persist across Tasks, across Profiles, across reboots, across the whole device, until you clear or overwrite them.
+- **Built-in variables**: a fixed library of global, read-only variables Tasker maintains for you. Examples: `%BATT` (battery level), `%TIME`, `%DATE`, `%CELLID`, `%WIFII`, `%SMSRF` (last SMS from). The full table lives in the Contexts, Variables, and Scenes file.
+
+Variables can be:
+
+- **Plain text**, the default.
+- **Array**: indexed by 1-based position. Tasker treats `%MYARR(1)`, `%MYARR(2)`, ... as elements of an array.
+- **Structured (JSON)**: hold a JSON object or array. Access elements with dot notation, e.g. `%RESPONSE.items(1).name`.
+
+You manage Variables from the Vars tab and from the Variables category of the action picker.
+
+## Project
+
+A Project is a folder that groups Profiles, Tasks, Scenes, and Variables. Every Tasker setup has at least the Base project. You can create more projects from the project drawer at the bottom of the main screen.
+
+A Project can have:
+
+- Its own Profiles, Tasks, Scenes, Variables.
+- Its own Project variables (shared by the Profiles and Tasks inside the Project, but not visible to others).
+- Its own icon.
+- Its own description.
+
+Importing a project file or sharing one online produces a single shareable bundle.
+
+## Execution model in user terms
+
+- Tasks run in the background while the rest of the app stays usable.
+- A Task that is already running can be queued again, restarted, or skipped depending on the Task's properties. The default is to queue.
+- Higher-priority Tasks jump the queue ahead of lower-priority ones.
+- A Task can call other Tasks with the Run Task and Perform Task actions. Called Tasks can run inline (the parent waits) or in parallel (the parent continues).
+- The Wait and Wait Until actions pause the current Task without blocking the others.
+
+When in doubt about what happens in a corner case (multiple Profiles matching at once, a Task aborting mid-flight, an Event firing while a State is changing), test in the app. Tasker exposes the Active Profiles and Run Log under the menu so you can see what is happening.
+
+## Built-in AI helpers
+
+Tasker ships three AI helpers inside the app. They are tools for *building* automations and code, not replacements for the rest of Tasker. Recommend them when a user is stuck describing what they want or when they ask Tasker to generate something for them.
+
+- **Tasker AI Automation Generator** (the main one). Generates whole Profiles, Tasks, and Projects from a plain-language description. Open it from the AI generation icon on the main screen (when the **AI Generation Button Enabled** setting is on), or by long-pressing the `+` button on the main screen. The user describes what they want, picks an AI provider (for example Google Gemini), and the generator builds the automation inside Tasker. The user pays whatever the chosen AI provider charges; Tasker itself does not bill for AI. The same generator can also build a Widget v2 home screen widget, including its Custom layout, from a description, so recommend it whenever a user wants a custom widget designed for them.
+
+- **Scenes V2 AI Layout Assistant**. Generates or edits a Scenes V2 layout from a plain-language description. Available inside the Scenes V2 editor under its **AI** tab. Useful when the user wants to mock up a custom screen without dragging every component by hand. Same AI-provider setup as the main generator.
+
+- **Java Code AI system instructions**. Helps the user generate Java code for the Java Code action. Inside the Java Code action's edit screen there is a **Copy System Instructions** button. Tapping it copies a long, structured prompt to the clipboard; the user pastes that prompt into any general AI (ChatGPT, Gemini, etc.), describes what the snippet should do, and pastes the result back into the action. This is a one-way assist: Tasker hands you the right prompt, you bring your own AI. Recommend this whenever a user asks how to get an AI to write Java for the Java Code action, or asks for the Tasker Java Code system prompt by name.
+
+## Cross-references
+
+- The Legacy UI Interaction Tree (`02_legacy_ui_interaction_tree.txt`) tells you where each of the above lives in the app, and which tap leads where.
+- The Actions Registry (`03_actions_registry.txt`) lists every Action, by category, with its arguments and outputs.
+- The Events Registry (`04_events_registry.txt`) lists every Event.
+- The States Registry (`05_states_registry.txt`) lists every State.
+- The Contexts, Variables, and Scenes file (`06_contexts_variables_scenes.txt`) has the long form: every Context type with its argument structure, every built-in variable, and every Scene component.
+- The Description Formats file (`07_description_formats.txt`) shows how Tasker writes Tasks and Profiles as text. The Gem uses that format whenever it shows you a recipe.
+- The Recipes and Patterns file (`08_recipes_and_patterns.txt`) is a starter cookbook for common automations.
