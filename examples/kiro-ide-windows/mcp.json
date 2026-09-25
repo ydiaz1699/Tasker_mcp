@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tasker-mcp": {
+      "command": "C:\\Users\\TU_USUARIO\\ruta\\Tasker_mcp\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "tasker_mcp"],
+      "env": {
+        "TASKER_HOST": "CAMBIAR_IP_DEL_TELEFONO",
+        "TASKER_PORT": "1821",
+        "TASKER_API_KEY": "CAMBIAR_tk_xxxxxxxx"
+      },
+      "disabled": false
+    }
+  }
+}
