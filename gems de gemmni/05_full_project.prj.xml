@@ -1,0 +1,143 @@
+<TaskerData sr="" dvi="1" tv="6.3.13">
+	<dmetric>1080.0,1920.0</dmetric>
+	<Profile sr="prof1" ve="2">
+		<id>1</id>
+		<mid0>1</mid0>
+		<mid1>2</mid1>
+		<nme>Silent at Work</nme>
+		<State sr="con0" ve="2">
+			<code>160</code>
+			<Str sr="arg0" ve="3">OfficeWiFi</Str>
+		</State>
+	</Profile>
+	<Profile sr="prof2" ve="2">
+		<id>2</id>
+		<mid0>3</mid0>
+		<mid1>4</mid1>
+		<nme>Night Mode</nme>
+		<Time sr="con0">
+			<fh>22</fh>
+			<fm>0</fm>
+			<th>7</th>
+			<tm>0</tm>
+		</Time>
+	</Profile>
+	<Profile sr="prof3" ve="2">
+		<id>3</id>
+		<mid0>5</mid0>
+		<nme>Auto Reply SMS</nme>
+		<Event sr="con0" ve="2">
+			<code>7</code>
+			<Str sr="arg0" ve="3">*</Str>
+		</Event>
+		<State sr="con1" ve="2">
+			<code>40</code>
+		</State>
+	</Profile>
+	<Project sr="proj0" ve="2">
+		<name>Smart Home Automation</name>
+		<pids>1,2,3</pids>
+		<tids>1,2,3,4,5</tids>
+	</Project>
+	<Task sr="task1">
+		<id>1</id>
+		<nme>Enter Work Mode</nme>
+		<Action sr="act0" ve="7">
+			<code>310</code>
+			<Int sr="arg0" val="1"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>305</code>
+			<Int sr="arg0" val="0"/>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>312</code>
+			<Int sr="arg0" val="2"/>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">Work mode ON</Str>
+		</Action>
+	</Task>
+	<Task sr="task2">
+		<id>2</id>
+		<nme>Exit Work Mode</nme>
+		<Action sr="act0" ve="7">
+			<code>310</code>
+			<Int sr="arg0" val="0"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>305</code>
+			<Int sr="arg0" val="10"/>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>312</code>
+			<Int sr="arg0" val="0"/>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">Work mode OFF</Str>
+		</Action>
+	</Task>
+	<Task sr="task3">
+		<id>3</id>
+		<nme>Enter Night Mode</nme>
+		<Action sr="act0" ve="7">
+			<code>810</code>
+			<Int sr="arg0" val="20"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>361</code>
+			<Int sr="arg0" val="1"/>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>304</code>
+			<Int sr="arg0" val="0"/>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>312</code>
+			<Int sr="arg0" val="3"/>
+		</Action>
+		<Action sr="act4" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">Night mode ON</Str>
+		</Action>
+	</Task>
+	<Task sr="task4">
+		<id>4</id>
+		<nme>Exit Night Mode</nme>
+		<Action sr="act0" ve="7">
+			<code>810</code>
+			<Int sr="arg0" val="150"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>361</code>
+			<Int sr="arg0" val="0"/>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>304</code>
+			<Int sr="arg0" val="12"/>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>312</code>
+			<Int sr="arg0" val="0"/>
+		</Action>
+		<Action sr="act4" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">Night mode OFF</Str>
+		</Action>
+	</Task>
+	<Task sr="task5">
+		<id>5</id>
+		<nme>Auto Reply In Call</nme>
+		<Action sr="act0" ve="7">
+			<code>41</code>
+			<Str sr="arg0" ve="3">%SMSRF</Str>
+			<Str sr="arg1" ve="3">I'm on a call, will get back to you shortly.</Str>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">Auto-replied to %SMSRN</Str>
+		</Action>
+	</Task>
+</TaskerData>

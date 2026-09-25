@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "tasker-mcp": {
+      "command": "python",
+      "args": ["-m", "tasker_mcp"],
+      "env": {},
+      "disabled": false
+    }
+  }
+}

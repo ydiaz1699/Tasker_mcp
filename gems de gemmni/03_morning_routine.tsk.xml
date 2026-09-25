@@ -1,0 +1,52 @@
+<TaskerData sr="" dvi="1" tv="6.3.13">
+	<Task sr="task1">
+		<id>1</id>
+		<nme>Morning Routine</nme>
+		<Action sr="act0" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">Good morning! Starting routine...</Str>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>425</code>
+			<Int sr="arg0" val="1"/>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>810</code>
+			<Int sr="arg0" val="180"/>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>307</code>
+			<Int sr="arg0" val="8"/>
+		</Action>
+		<Action sr="act4" ve="7">
+			<code>304</code>
+			<Int sr="arg0" val="12"/>
+		</Action>
+		<Action sr="act5" ve="7">
+			<code>305</code>
+			<Int sr="arg0" val="10"/>
+		</Action>
+		<Action sr="act6" ve="7">
+			<code>559</code>
+			<Str sr="arg0" ve="3">Good morning. Battery is at %BATT percent.</Str>
+			<Str sr="arg1" ve="3">default:default</Str>
+		</Action>
+		<Action sr="act7" ve="7">
+			<code>339</code>
+			<Str sr="arg0" ve="3">GET</Str>
+			<Str sr="arg1" ve="3">https://api.weather.example.com/today</Str>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3"/>
+			<Int sr="arg4" val="15"/>
+		</Action>
+		<Action sr="act8" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%MORNING_DONE</Str>
+			<Str sr="arg1" ve="3">1</Str>
+		</Action>
+		<Action sr="act9" ve="7">
+			<code>548</code>
+			<Str sr="arg0" ve="3">Morning routine complete!</Str>
+		</Action>
+	</Task>
+</TaskerData>

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "tasker-mcp": {
+      "command": "python",
+      "args": ["-m", "tasker_mcp"],
+      "cwd": "/path/to/Tasker_mcp",
+      "env": {
+        "PYTHONPATH": "/path/to/Tasker_mcp/src"
+      }
+    }
+  }
+}
