@@ -159,11 +159,31 @@ Extraídas de `dceluis/tasker-mcp` (ficha en `Varios_tools/tool_catalog/entries/
 
 ---
 
+## Dónde montarlo (qué cliente MCP)
+
+| Cliente | Dónde corre | ¿Ejecuta en vivo? | Ejemplo |
+|---|---|---|---|
+| **Kiro IDE (Windows)** | tu PC | ✅ si el teléfono está en la misma WiFi | `examples/kiro-ide-windows/` |
+| **Kiro CLI (NAS)** | el NAS | ✅ si el teléfono está en la LAN del NAS | `examples/kiro-cli/` |
+| Kiro Web | sandbox nube | ❌ sin ruta a la LAN privada | — (solo diseño de XML si se ejecutara ahí) |
+| Claude Desktop / Cursor | tu PC | ✅ (mismo `mcpServers`) | usar el `mcp.json` de Windows como base |
+
+Para el caso más común (Kiro IDE en Windows con el teléfono en la misma red) es la vía
+más directa: un solo cliente diseña, valida **y** ejecuta.
+
 ## Notas de realidad
 
 - La **generación de XML es 100 % offline**; la **ejecución en vivo necesita el móvil**
   en red con Tasker corriendo.
-- **Kiro Web no puede ejecutar** (sin ruta a la LAN/teléfono); usar Kiro CLI en el NAS
-  o el propio teléfono/PC. La generación sí funciona en cualquier sitio.
+- **Kiro Web no puede ejecutar** (sandbox en la nube, sin ruta a la LAN/teléfono). Usar
+  **Kiro IDE en Windows** o **Kiro CLI en el NAS**, que corren en tu red. La generación
+  de XML sí funciona en cualquier sitio.
+- No hace falta ninguna extensión de navegador (p. ej. MCP SuperAssistant) para esto:
+  Kiro IDE ya es un cliente MCP local. SuperAssistant solo aplica a chats web
+  (ChatGPT/Gemini/…), que es otro escenario.
 - El repo externo es MIT; aquí no se copia su código, solo se reimplementa la idea del
   `POST /run_task` de forma independiente en Python.
+- **Espejo de seguridad:** como el original ([dceluis/tasker-mcp](https://github.com/dceluis/tasker-mcp))
+  está inactivo desde 2025-03, se conserva una copia propia en
+  [ydiaz1699/tasker-mcp-dceluis](https://github.com/ydiaz1699/tasker-mcp-dceluis)
+  (ver su `UPSTREAM.md` para la procedencia).
