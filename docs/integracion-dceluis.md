@@ -183,3 +183,7 @@ más directa: un solo cliente diseña, valida **y** ejecuta.
   (ChatGPT/Gemini/…), que es otro escenario.
 - El repo externo es MIT; aquí no se copia su código, solo se reimplementa la idea del
   `POST /run_task` de forma independiente en Python.
+- **Espejo de seguridad:** como el original ([dceluis/tasker-mcp](https://github.com/dceluis/tasker-mcp))
+  está inactivo desde 2025-03, se conserva una copia propia en
+  [ydiaz1699/tasker-mcp-dceluis](https://github.com/ydiaz1699/tasker-mcp-dceluis)
+  (ver su `UPSTREAM.md` para la procedencia).
