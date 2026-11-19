@@ -9,7 +9,7 @@ tasker-mcp-server/
 ├── src/tasker_mcp/
 │   ├── __init__.py              # Package (v0.1.0)
 │   ├── __main__.py              # Entry point: python -m tasker_mcp
-│   ├── server.py                # FastMCP v3 server (13 tools, 4 resources)
+│   ├── server.py                # FastMCP v3 server (17 tools, 4 resources)
 │   ├── knowledge/               # Enrichment data (descriptions, args, variables, patterns)
 │   │   ├── actions.py           # action descriptions + args (enriches the source)
 │   │   ├── events.py            # event descriptions + args
@@ -21,10 +21,11 @@ tasker-mcp-server/
 │   │   ├── build_db.py          # merge source+knowledge → SQLite + FTS5 (BM25)
 │   │   ├── search.py            # full-text search over the index
 │   │   └── data/                # vendored source .md (versioned) + tasker_index.db (generated)
-│   ├── xml_engine/              # XML generation engine
+│   ├── xml_engine/              # XML generation & translation engine
 │   │   ├── models.py            # Pydantic models (Task, Profile, Project, Contexts)
 │   │   ├── generator.py         # TaskerXMLGenerator (ElementTree)
-│   │   └── builder.py           # Fluent API (quick_task, quick_project)
+│   │   ├── builder.py           # Fluent API (quick_task, quick_project)
+│   │   └── translator.py        # Safe XML translation & comparison engine
 │   └── agent/                   # Agent integrations
 │       └── tasker_agent.py      # TaskerAgent + Strands SDK factory
 ├── docs/                        # Reference documentation & Gemini Gem prompts
@@ -132,7 +133,7 @@ xml = (
 agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 ```
 
-## Tools (14)
+## Tools (17)
 
 | Tool | Description |
 |------|-------------|
@@ -145,6 +146,9 @@ agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 | `generate_project_xml` | Generate .prj.xml with multiple profiles |
 | `generate_quick_automation` | Generate XML from natural language description |
 | `validate_tasker_xml` | Validate Tasker XML structure and action codes |
+| `extract_translatable_strings` | Extract user-facing strings (dialogs, flashes, TTS, descriptions) safely for translation |
+| `translate_tasker_xml` | Safely apply translated strings and target TTS voice engine to Tasker XML |
+| `compare_tasker_xmls` | Compare original vs translated XML and audit safety (detects broken task names or regressions) |
 | `get_action_info` | Get detailed info for a specific action code |
 | `list_action_categories` | List all 18 action categories with counts |
 | `list_common_patterns` | List 10 pre-built automation patterns |

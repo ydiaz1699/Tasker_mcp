@@ -1,7 +1,8 @@
 """Tasker MCP Server - FastMCP v3 server exposing Tasker automation tools.
 
-Provides 13 tools, 4 resources for generating Tasker XML configurations,
-searching the Tasker knowledge base, and working with automation patterns.
+Provides 17 tools, 4 resources for generating Tasker XML configurations,
+translating and localizing projects, searching the Tasker knowledge base,
+and working with automation patterns.
 
 Run with: python -m tasker_mcp
 """
@@ -30,6 +31,7 @@ from tasker_mcp.xml_engine import (
     EventContext,
     StateContext,
     TaskerXMLGenerator,
+    TaskerXMLTranslator,
     TimeContext,
 )
 from tasker_mcp.xml_engine.models import (
@@ -579,6 +581,69 @@ def validate_tasker_xml(xml_content: str) -> str:
             errors.append(f"Profile missing <mid0> (entry task) element")
 
     return json.dumps({"valid": len(errors) == 0, "errors": errors, "info": info}, indent=2)
+
+
+@mcp.tool
+def extract_translatable_strings(xml_content: str) -> str:
+    """Extract all user-facing, translatable strings from a Tasker XML.
+
+    Scans dialog titles/messages, notification texts, flash alerts, TTS speech,
+    project share descriptions, and default variable values while safely ignoring
+    internal logic (task names, variable names, HTTP calls, or code tags).
+
+    Args:
+        xml_content: Tasker XML string (.tsk.xml, .prf.xml, or .prj.xml).
+
+    Returns:
+        JSON list of translatable items with unique ID, location context, and original text.
+    """
+    strings = TaskerXMLTranslator.extract_strings(xml_content)
+    return json.dumps(strings, indent=2, ensure_ascii=False)
+
+
+@mcp.tool
+def translate_tasker_xml(
+    xml_content: str,
+    translations_json: str,
+    tts_locale: Optional[str] = None,
+) -> str:
+    """Safely apply translated strings to a Tasker XML file.
+
+    Updates user-facing strings without breaking internal Tasker structure,
+    task names, variable references, or API payloads.
+
+    Args:
+        xml_content: Original Tasker XML string.
+        translations_json: JSON object mapping string IDs or original texts to translated texts.
+                           Example: {"proj:Share:d": "Nueva descripción", "Di algo": "Say something"}
+        tts_locale: Optional TTS engine locale (e.g. 'com.google.android.tts:spa-MEX').
+                    If provided, updates all Say (code 559) actions to this voice engine.
+
+    Returns:
+        Updated valid Tasker XML string.
+    """
+    translations = json.loads(translations_json)
+    return TaskerXMLTranslator.apply_translations(
+        xml_content, translations=translations, tts_locale=tts_locale
+    )
+
+
+@mcp.tool
+def compare_tasker_xmls(original_xml: str, translated_xml: str) -> str:
+    """Compare an original Tasker XML against a translated version to verify safety.
+
+    Audits that task names, variable references, and action codes were preserved,
+    and lists all user-facing changes vs any unintended logic regressions.
+
+    Args:
+        original_xml: The original Tasker XML content.
+        translated_xml: The translated/modified Tasker XML content.
+
+    Returns:
+        JSON report with safety diagnosis (is_safe, translated_strings, warnings, condition_changes).
+    """
+    report = TaskerXMLTranslator.compare_xmls(original_xml, translated_xml)
+    return json.dumps(report, indent=2, ensure_ascii=False)
 
 
 @mcp.tool

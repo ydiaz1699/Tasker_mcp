@@ -2,6 +2,7 @@
 
 from tasker_mcp.xml_engine.builder import TaskBuilder, quick_project, quick_task
 from tasker_mcp.xml_engine.generator import TaskerXMLGenerator
+from tasker_mcp.xml_engine.translator import TaskerXMLTranslator
 from tasker_mcp.xml_engine.models import (
     AppContext,
     EventContext,
@@ -23,8 +24,9 @@ __all__ = [
     "EventContext",
     "StateContext",
     "AppContext",
-    # Generator
+    # Generator & Translator
     "TaskerXMLGenerator",
+    "TaskerXMLTranslator",
     # Builder
     "TaskBuilder",
     "quick_task",
