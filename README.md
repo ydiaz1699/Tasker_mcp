@@ -27,7 +27,8 @@ tasker-mcp-server/
 │   │   └── builder.py           # Fluent API (quick_task, quick_project)
 │   └── agent/                   # Agent integrations
 │       └── tasker_agent.py      # TaskerAgent + Strands SDK factory
-├── examples/                    # Generated XML examples
+├── docs/                        # Reference documentation & Gemini Gem prompts
+├── examples/                    # Generated XML examples and usage demo
 ├── pyproject.toml               # Hatchling build config
 ├── mcp_config.json              # Kiro/generic MCP config
 └── claude_desktop_config.json   # Claude Desktop config
