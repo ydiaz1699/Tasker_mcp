@@ -200,9 +200,9 @@ def search_tasker_variables(query: str, category: Optional[str] = None) -> str:
 
     Args:
         query: Search term (e.g., 'battery', 'wifi', 'time', 'sms')
-        category: Optional filter (Battery, Bluetooth, Call, Date/Time,
-                  Display, Location, Network, Phone, SMS, Clipboard,
-                  Music, Notification, System, Tasker, Profile)
+        category: Optional filter (Battery, Bluetooth, Calendar, Call, Date/Time,
+                  Display, Email, Hardware, Location, Music, Network, Notification,
+                  Phone, Profile, Sensors, SMS, Clipboard, System, Tasker)
 
     Returns:
         JSON list of matching variables with name, description, category.

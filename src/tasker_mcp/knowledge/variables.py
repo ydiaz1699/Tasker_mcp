@@ -29,11 +29,20 @@ BUILTIN_VARIABLES: dict[str, TaskerVariable] = {
     "%BLUE": TaskerVariable("%BLUE", "Bluetooth status: on or off", "Bluetooth", dynamic=True),
     "%BTSTATUS": TaskerVariable("%BTSTATUS", "Bluetooth status: on/off/connected", "Bluetooth", dynamic=True),
 
+    # ─── Calendar ───
+    "%CALTITLE": TaskerVariable("%CALTITLE", "Title of the current calendar event (or shortest if multiple)", "Calendar"),
+    "%CALDESCR": TaskerVariable("%CALDESCR", "Description of the current calendar event", "Calendar"),
+    "%CALLOC": TaskerVariable("%CALLOC", "Location of the current calendar event", "Calendar"),
+
     # ─── Call ───
     "%CALS": TaskerVariable("%CALS", "Call status: incoming/outgoing/ongoing", "Call"),
     "%CALL": TaskerVariable("%CALL", "Whether currently in a call: true/false", "Call", dynamic=True),
     "%CNAME": TaskerVariable("%CNAME", "Name of current/last caller", "Call"),
     "%CNUM": TaskerVariable("%CNUM", "Number of current/last caller", "Call"),
+    "%CDATE": TaskerVariable("%CDATE", "Date of current incoming call", "Call", dynamic=True, monitored=True),
+    "%CTIME": TaskerVariable("%CTIME", "Time of current incoming call", "Call", dynamic=True, monitored=True),
+    "%CONAME": TaskerVariable("%CONAME", "Caller name of current outgoing call", "Call", dynamic=True, monitored=True),
+    "%CONUM": TaskerVariable("%CONUM", "Caller number of current outgoing call", "Call", dynamic=True, monitored=True),
     "%CODATE": TaskerVariable("%CODATE", "Date of last outgoing call", "Call"),
     "%COTIME": TaskerVariable("%COTIME", "Time of last outgoing call", "Call"),
     "%CODUR": TaskerVariable("%CODUR", "Duration in seconds of last outgoing call", "Call"),
@@ -42,6 +51,7 @@ BUILTIN_VARIABLES: dict[str, TaskerVariable] = {
     "%CIDATE": TaskerVariable("%CIDATE", "Date of last incoming call", "Call"),
     "%CITIME": TaskerVariable("%CITIME", "Time of last incoming call", "Call"),
     "%CIDUR": TaskerVariable("%CIDUR", "Duration in seconds of last incoming call", "Call"),
+    "%SPHONE": TaskerVariable("%SPHONE", "Whether speakerphone is currently on or off", "Call", dynamic=True),
 
     # ─── Date/Time ───
     "%TIME": TaskerVariable("%TIME", "Current time in HH.MM format", "Date/Time", dynamic=True),
@@ -51,6 +61,8 @@ BUILTIN_VARIABLES: dict[str, TaskerVariable] = {
     "%DATEFMT": TaskerVariable("%DATEFMT", "Current date in specified format", "Date/Time"),
     "%DATEF": TaskerVariable("%DATEF", "Current date in DD-MM-YYYY format", "Date/Time"),
     "%DAY": TaskerVariable("%DAY", "Current day of month (1-31)", "Date/Time"),
+    "%DAYM": TaskerVariable("%DAYM", "Current day of the month (1-31)", "Date/Time"),
+    "%DAYW": TaskerVariable("%DAYW", "Current day of the week (Sunday, Monday, etc.)", "Date/Time"),
     "%DESSION": TaskerVariable("%DESSION", "Undocumented date session var", "Date/Time"),
     "%MESSION": TaskerVariable("%MESSION", "Undocumented month session var", "Date/Time"),
     "%TESSION": TaskerVariable("%TESSION", "Undocumented time session var", "Date/Time"),
@@ -60,6 +72,24 @@ BUILTIN_VARIABLES: dict[str, TaskerVariable] = {
     "%BRIGHT": TaskerVariable("%BRIGHT", "Current display brightness 0-255", "Display"),
     "%DTOUT": TaskerVariable("%DTOUT", "Current display timeout in seconds", "Display"),
     "%SYSRES": TaskerVariable("%SYSRES", "System display resolution WxH", "Display"),
+
+    # ─── Email ───
+    "%EFROM": TaskerVariable("%EFROM", "Sender of last received email", "Email", dynamic=True),
+    "%ECC": TaskerVariable("%ECC", "Cc recipients of last received email", "Email", dynamic=True),
+    "%ESUBJ": TaskerVariable("%ESUBJ", "Subject of last received email", "Email", dynamic=True),
+    "%EDATE": TaskerVariable("%EDATE", "Date of last received email", "Email", dynamic=True),
+    "%ETIME": TaskerVariable("%ETIME", "Time of last received email", "Email", dynamic=True),
+
+    # ─── Hardware & Sensors ───
+    "%CPUFREQ": TaskerVariable("%CPUFREQ", "Current frequency CPU 0 is running at (MHz)", "Hardware"),
+    "%CPUGOV": TaskerVariable("%CPUGOV", "Current governor controlling CPU 0 frequency", "Hardware"),
+    "%MEMF": TaskerVariable("%MEMF", "System free memory remaining in MB", "Hardware", dynamic=True),
+    "%LIGHT": TaskerVariable("%LIGHT", "Ambient light level in lux", "Sensors", dynamic=True, monitored=True),
+    "%PRESSURE": TaskerVariable("%PRESSURE", "Current air pressure in millibars", "Sensors", dynamic=True, monitored=True),
+    "%TEMP": TaskerVariable("%TEMP", "Ambient temperature in degrees Celsius", "Sensors", dynamic=True, monitored=True),
+    "%HUMIDITY": TaskerVariable("%HUMIDITY", "Relative ambient air humidity percentage", "Sensors", dynamic=True, monitored=True),
+    "%MFIELD": TaskerVariable("%MFIELD", "Magnetic field strength in micro-Teslas", "Sensors", dynamic=True, monitored=True),
+    "%HEART": TaskerVariable("%HEART", "Current detected heart rate in bpm", "Sensors", dynamic=True, monitored=True),
 
     # ─── Location ───
     "%LOC": TaskerVariable("%LOC", "Last known location as lat,lon", "Location", monitored=True),
@@ -80,18 +110,27 @@ BUILTIN_VARIABLES: dict[str, TaskerVariable] = {
     "%CELLID": TaskerVariable("%CELLID", "Current cell tower ID", "Network", monitored=True),
     "%CELLSIG": TaskerVariable("%CELLSIG", "Current cell signal strength (dBm)", "Network", dynamic=True),
     "%CELLSRV": TaskerVariable("%CELLSRV", "Cell service status: roaming/searching/service/noservice", "Network"),
+    "%ROAM": TaskerVariable("%ROAM", "Whether device is roaming on telephone network: on/off", "Network", dynamic=True),
+    "%TETHER": TaskerVariable("%TETHER", "Comma-separated list of enabled tethering forms (wifi, usb, bt)", "Network", dynamic=True),
     "%TETHBT": TaskerVariable("%TETHBT", "Bluetooth tether status: on/off", "Network"),
     "%TETHUSB": TaskerVariable("%TETHUSB", "USB tether status: on/off", "Network"),
     "%TETHWIFI": TaskerVariable("%TETHWIFI", "WiFi tether (hotspot) status: on/off", "Network"),
+    "%WIMAX": TaskerVariable("%WIMAX", "Whether WiMAX status is on or off", "Network"),
+    "%HTTPR": TaskerVariable("%HTTPR", "HTTP response code from last HTTP action", "Network", dynamic=True),
+    "%HTTPD": TaskerVariable("%HTTPD", "HTTP response body data from last HTTP action", "Network", dynamic=True),
+    "%HTTPL": TaskerVariable("%HTTPL", "HTTP response content length from last HTTP action", "Network", dynamic=True),
 
     # ─── Phone ───
     "%PESSION": TaskerVariable("%PESSION", "Phone session variable", "Phone"),
     "%PNUM": TaskerVariable("%PNUM", "Current phone number of the device", "Phone"),
     "%DEVID": TaskerVariable("%DEVID", "Device unique ID", "Phone"),
+    "%DEVTID": TaskerVariable("%DEVTID", "Device telephony ID (IMEI for GSM, MEID for CDMA)", "Phone"),
     "%DEVMAN": TaskerVariable("%DEVMAN", "Device manufacturer", "Phone"),
     "%DEVMOD": TaskerVariable("%DEVMOD", "Device model", "Phone"),
     "%DEVPROD": TaskerVariable("%DEVPROD", "Device product name", "Phone"),
     "%SDK": TaskerVariable("%SDK", "Android SDK version number", "Phone"),
+    "%SIMNUM": TaskerVariable("%SIMNUM", "SIM card serial number (ICCID)", "Phone"),
+    "%SIMSTATE": TaskerVariable("%SIMSTATE", "Current SIM state: unknown/absent/pinrequired/pukrequired/netlocked/ready", "Phone"),
 
     # ─── SMS ───
     "%SMSRN": TaskerVariable("%SMSRN", "Name of last SMS sender (incoming)", "SMS"),
@@ -122,6 +161,15 @@ BUILTIN_VARIABLES: dict[str, TaskerVariable] = {
     "%LAPP": TaskerVariable("%LAPP", "Label of last used application", "System", dynamic=True),
     "%PACTIVE": TaskerVariable("%PACTIVE", "Comma-separated list of active profiles", "System"),
     "%ROESSION": TaskerVariable("%ROESSION", "Undocumented roam session var", "System"),
+    "%MUTED": TaskerVariable("%MUTED", "Whether microphone is currently muted: on/off", "System", dynamic=True),
+    "%SILENT": TaskerVariable("%SILENT", "Current silent mode state: off/vibrate/on", "System", dynamic=True),
+    "%NIGHT": TaskerVariable("%NIGHT", "Current Android Night Mode: on/off/auto", "System", dynamic=True),
+    "%UIMODE": TaskerVariable("%UIMODE", "Current Android UI mode: car/desk/appliance/tv/watch/normal", "System", dynamic=True, monitored=True),
+    "%KEYG": TaskerVariable("%KEYG", "Whether Keyguard (lockscreen) is on or off", "System", dynamic=True),
+    "%ROOT": TaskerVariable("%ROOT", "Whether root functions are available: yes/no", "System"),
+    "%IMETHOD": TaskerVariable("%IMETHOD", "Current active input method name and subtype", "System"),
+    "%FOTO": TaskerVariable("%FOTO", "Filesystem path to last photo taken by Tasker or camera", "System", dynamic=True),
+    "%SPEECH": TaskerVariable("%SPEECH", "Current utterance from Say or Say File action", "System", dynamic=True),
     "%VOLC": TaskerVariable("%VOLC", "Current call volume", "System"),
     "%VOLM": TaskerVariable("%VOLM", "Current media volume", "System"),
     "%VOLN": TaskerVariable("%VOLN", "Current notification volume", "System"),
@@ -137,6 +185,8 @@ BUILTIN_VARIABLES: dict[str, TaskerVariable] = {
     "%TNET": TaskerVariable("%TNET", "Task entry task name", "Tasker"),
     "%TPRI": TaskerVariable("%TPRI", "Current task priority", "Tasker"),
     "%TCAL": TaskerVariable("%TCAL", "Caller task name (if run via Perform Task)", "Tasker"),
+    "%qtime": TaskerVariable("%qtime", "Task queue time in seconds that task has been running", "Tasker"),
+    "%tasker_current_action_number": TaskerVariable("%tasker_current_action_number", "Current action number in the running task (Tasker 6.2+)", "Tasker"),
     "%priority": TaskerVariable("%priority", "Current task priority (local)", "Tasker"),
     "%caller": TaskerVariable("%caller", "Task/profile/scene that started current task", "Tasker"),
     "%err": TaskerVariable("%err", "Error code from last action (0 = no error)", "Tasker"),

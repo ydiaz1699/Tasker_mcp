@@ -1,6 +1,6 @@
 # Tasker MCP Server
 
-MCP (Model Context Protocol) server for generating valid **Tasker XML** automation configurations for Android. Provides a complete knowledge base of 373 action codes, 82 events, 50 states, and 99 built-in variables, plus an XML engine that produces files directly importable into Tasker.
+MCP (Model Context Protocol) server for generating valid **Tasker XML** automation configurations for Android. Provides a complete knowledge base of 373 action codes, 82 events, 50 states, and 143 built-in variables, plus an XML engine that produces files directly importable into Tasker.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ tasker-mcp-server/
 │   │   ├── actions.py           # action descriptions + args (enriches the source)
 │   │   ├── events.py            # event descriptions + args
 │   │   ├── states.py            # state descriptions + args
-│   │   ├── variables.py         # 99 built-in variables (%BATT, %WIFI, etc.)
+│   │   ├── variables.py         # 143 built-in variables (%BATT, %WIFI, etc.)
 │   │   └── patterns.py          # 10 common automation patterns
 │   ├── indexer/                 # Search index (n8n-mcp pattern: SOURCE→LOADER→PARSER→DB)
 │   │   ├── loader.py            # fetch+parse Taskomater/Tasker-XML-Info (authoritative)
@@ -139,7 +139,7 @@ agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 | `search_tasker_actions` | Search 373 action codes by name/description, filter by category |
 | `search_tasker_events` | Search 82 profile event triggers |
 | `search_tasker_states` | Search 50 profile state contexts |
-| `search_tasker_variables` | Search 99 built-in variables (%BATT, %WIFI, etc.) |
+| `search_tasker_variables` | Search 143 built-in variables (%BATT, %WIFI, etc.) |
 | `generate_task_xml` | Generate .tsk.xml from action list |
 | `generate_profile_xml` | Generate .prf.xml with trigger + entry/exit tasks |
 | `generate_project_xml` | Generate .prj.xml with multiple profiles |
@@ -247,7 +247,7 @@ from inventing codes, this server ships a searchable index built the same way as
 - **SOURCE (authoritative):** [Taskomater/Tasker-XML-Info](https://github.com/Taskomater/Tasker-XML-Info)
   gives `code → name → kind` for the 373 actions, 82 events and 50 states. A copy is
   vendored in `indexer/data/Tasker_XML_Codes.md` so builds work offline.
-- **ENRICHMENT:** `knowledge/*.py` adds descriptions, args and the 99 variables/patterns
+- **ENRICHMENT:** `knowledge/*.py` adds descriptions, args and the 143 variables/patterns
   the source doesn't carry.
 - **DB:** `build_db.py` merges both into `tasker_index.db` (SQLite + FTS5, BM25 ranking).
 - The `search_tasker_*` tools query this index. If the DB is missing they **fall back**
