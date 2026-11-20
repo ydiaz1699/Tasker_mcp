@@ -17,6 +17,7 @@ class TaskerEvent:
     category: str
     description: str
     args: list[str] = field(default_factory=list)
+    output_variables: list[str] = field(default_factory=list)
 
 
 # fmt: off
@@ -165,3 +166,21 @@ def search_events(
         ):
             results.append(event)
     return results
+
+
+# Load and attach output variables from Tasker AI native catalog
+def _load_output_variables():
+    from pathlib import Path
+    import json
+    out_file = Path(__file__).parent / "output_variables.json"
+    if out_file.exists():
+        try:
+            data = json.loads(out_file.read_text(encoding="utf-8"))
+            for code_str, vars_list in data.get("events", {}).items():
+                code = int(code_str)
+                if code in PROFILE_EVENTS:
+                    PROFILE_EVENTS[code].output_variables = vars_list
+        except Exception:
+            pass
+
+_load_output_variables()

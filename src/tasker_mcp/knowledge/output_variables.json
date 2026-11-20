@@ -1,0 +1,644 @@
+{
+  "actions": {
+    "312": [
+      "%dnd_allow_callers",
+      "%dnd_allow_message_senders",
+      "%dnd_categories()",
+      "%dnd_mode",
+      "%dnd_suppressed_effects()"
+    ],
+    "317": [
+      "%new_state"
+    ],
+    "321": [
+      "%gd_id",
+      "%gd_md5",
+      "%gd_mimetype",
+      "%gd_time",
+      "%gd_name",
+      "%gd_size",
+      "%gd_uploaded",
+      "%gd_weburl"
+    ],
+    "324": [
+      "%gd_id()",
+      "%gd_md5()",
+      "%gd_mimetype()",
+      "%gd_time()",
+      "%gd_name()",
+      "%gd_size()",
+      "%gd_weburl()"
+    ],
+    "325": [
+      "%gd_id",
+      "%gd_md5",
+      "%gd_mimetype",
+      "%gd_time",
+      "%gd_name",
+      "%gd_size",
+      "%gd_weburl"
+    ],
+    "326": [
+      "%gd_local_paths()"
+    ],
+    "327": [
+      "%gd_account"
+    ],
+    "328": [
+      "%kb_text",
+      "%kb_text_selected",
+      "%kb_text_after_cursor",
+      "%kb_text_before_cursor"
+    ],
+    "330": [
+      "%nfc_id",
+      "%nfc_id_with_colons",
+      "%nfc_payload",
+      "%nfc_present",
+      "%nfc_types()"
+    ],
+    "333": [
+      "%new_state"
+    ],
+    "335": [
+      "%app_icon",
+      "%app_name",
+      "%app_package"
+    ],
+    "338": [
+      "%nc_id()",
+      "%nc_description()",
+      "%nc_enabled()",
+      "%nc_group_enabled()",
+      "%nc_group_id()",
+      "%nc_group_name()",
+      "%nc_importance()",
+      "%nc_name()"
+    ],
+    "339": [
+      "%http_data",
+      "%http_file_output",
+      "%http_response_code",
+      "%http_cookies",
+      "%http_headers()",
+      "%http_response_length"
+    ],
+    "340": [
+      "%bt_address",
+      "%bt_alias",
+      "%bt_battery_level",
+      "%bt_paired",
+      "%bt_class",
+      "%bt_class_name",
+      "%bt_connected",
+      "%bt_encrypted",
+      "%bt_major_class",
+      "%bt_major_class_name",
+      "%bt_name",
+      "%bt_signal_strength",
+      "%bt_type"
+    ],
+    "351": [
+      "%http_auth_headers"
+    ],
+    "352": [
+      "%nd_received_bytes",
+      "%nd_received_g_bytes",
+      "%nd_received_k_bytes",
+      "%nd_received_m_bytes",
+      "%nd_sent_bytes",
+      "%nd_sent_g_bytes",
+      "%nd_sent_k_bytes",
+      "%nd_sent_m_bytes",
+      "%nd_received_packets",
+      "%nd_sent_packets"
+    ],
+    "358": [
+      "%bt_address",
+      "%bt_alias",
+      "%bt_battery_level",
+      "%bt_paired",
+      "%bt_class",
+      "%bt_class_name",
+      "%bt_connected",
+      "%bt_encrypted",
+      "%bt_major_class",
+      "%bt_major_class_name",
+      "%bt_name",
+      "%bt_signal_strength",
+      "%bt_type"
+    ],
+    "360": [
+      "%input"
+    ],
+    "361": [
+      "%new_state"
+    ],
+    "364": [
+      "%na_day",
+      "%na_month",
+      "%na_package",
+      "%na_time",
+      "%na_time_to_alarm_days",
+      "%na_time_to_alarm_hours",
+      "%na_time_to_alarm_minutes",
+      "%na_time_to_alarm_seconds",
+      "%na_time_ms",
+      "%na_year"
+    ],
+    "366": [
+      "%gl_coordinates_accuracy",
+      "%gl_altitude",
+      "%gl_altitude_accuracy",
+      "%gl_bearing",
+      "%gl_bearing_accuracy",
+      "%gl_latitude",
+      "%gl_coordinates",
+      "%gl_longitude",
+      "%gl_map_url",
+      "%gl_satellites",
+      "%gl_speed",
+      "%gl_speed_accuracy",
+      "%gl_time_seconds",
+      "%gl_time_gnss_milliseconds",
+      "%gl_time_milliseconds",
+      "%gl_time_adjusted_milliseconds",
+      "%gl_time_offset_milliseconds",
+      "%gl_time_taken_millis"
+    ],
+    "367": [
+      "%new_state"
+    ],
+    "368": [
+      "%pl_latitude",
+      "%pl_coordinates",
+      "%pl_longitude",
+      "%pl_map_url",
+      "%pl_radius"
+    ],
+    "372": [
+      "%sensor_max_range",
+      "%sensor_mode",
+      "%sensor_name",
+      "%sensor_power",
+      "%sensor_resolution",
+      "%sensor_type",
+      "%sensor_type_string",
+      "%sensor_vendor",
+      "%sensor_is_wake_up"
+    ],
+    "373": [
+      "%as_accuracy",
+      "%as_values()"
+    ],
+    "374": [
+      "%sc_file",
+      "%sc_is_capturing"
+    ],
+    "375": [
+      "%aw_output"
+    ],
+    "377": [
+      "%td_button"
+    ],
+    "379": [
+      "%ao_output()"
+    ],
+    "390": [
+      "%input"
+    ],
+    "903": [
+      "%gv_confidence",
+      "%gv_heard"
+    ],
+    "391": [
+      "%pd_type"
+    ],
+    "394": [
+      "%dt_day_of_month",
+      "%dt_millis",
+      "%dt_month_of_year",
+      "%dt_seconds",
+      "%dt_year"
+    ],
+    "396": [
+      "%mt_match",
+      "%mt_match_found"
+    ],
+    "397": [
+      "%my_accent1_0",
+      "%my_accent1_10",
+      "%my_accent1_100",
+      "%my_accent1_1000",
+      "%my_accent1_200",
+      "%my_accent1_300",
+      "%my_accent1_400",
+      "%my_accent1_50",
+      "%my_accent1_500",
+      "%my_accent1_600",
+      "%my_accent1_700",
+      "%my_accent1_800",
+      "%my_accent1_900",
+      "%my_accent2_0",
+      "%my_accent2_10",
+      "%my_accent2_100",
+      "%my_accent2_1000",
+      "%my_accent2_200",
+      "%my_accent2_300",
+      "%my_accent2_400",
+      "%my_accent2_50",
+      "%my_accent2_500",
+      "%my_accent2_600",
+      "%my_accent2_700",
+      "%my_accent2_800",
+      "%my_accent2_900",
+      "%my_accent3_0",
+      "%my_accent3_10",
+      "%my_accent3_100",
+      "%my_accent3_1000",
+      "%my_accent3_200",
+      "%my_accent3_300",
+      "%my_accent3_400",
+      "%my_accent3_50",
+      "%my_accent3_500",
+      "%my_accent3_600",
+      "%my_accent3_700",
+      "%my_accent3_800",
+      "%my_accent3_900",
+      "%my_neutral1_0",
+      "%my_neutral1_10",
+      "%my_neutral1_100",
+      "%my_neutral1_1000",
+      "%my_neutral1_200",
+      "%my_neutral1_300",
+      "%my_neutral1_400",
+      "%my_neutral1_50",
+      "%my_neutral1_500",
+      "%my_neutral1_600",
+      "%my_neutral1_700",
+      "%my_neutral1_800",
+      "%my_neutral1_900",
+      "%my_neutral2_0",
+      "%my_neutral2_10",
+      "%my_neutral2_100",
+      "%my_neutral2_1000",
+      "%my_neutral2_200",
+      "%my_neutral2_300",
+      "%my_neutral2_400",
+      "%my_neutral2_50",
+      "%my_neutral2_500",
+      "%my_neutral2_600",
+      "%my_neutral2_700",
+      "%my_neutral2_800",
+      "%my_neutral2_900"
+    ],
+    "399": [
+      "%vm_output"
+    ],
+    "402": [
+      "%cl_extras",
+      "%cl_html_text",
+      "%cl_image_uri",
+      "%cl_mimetypes()",
+      "%cl_text",
+      "%cl_uri"
+    ],
+    "407": [
+      "%sb_uri",
+      "%sb_uris()"
+    ],
+    "414": [
+      "%pc_color",
+      "%pc_colors()"
+    ],
+    "418": [
+      "%ce_account()",
+      "%ce_account_type()",
+      "%ce_all_day()",
+      "%ce_available()",
+      "%ce_start_time()",
+      "%ce_start_time_utc()",
+      "%ce_calendar()",
+      "%ce_color()",
+      "%ce_description()",
+      "%ce_end_time()",
+      "%ce_end_time_utc()",
+      "%ce_event_id()",
+      "%ce_location()",
+      "%ce_timezone()",
+      "%ce_guests_can_invite()",
+      "%ce_guests_can_modify()",
+      "%ce_guests_can_see_guests()",
+      "%ce_owner_account()",
+      "%ce_title()",
+      "%ce_visible()",
+      "%ce_is_organizer()"
+    ],
+    "421": [
+      "%ai_app_class",
+      "%ai_app_package",
+      "%ai_extras",
+      "%ai_app_name",
+      "%ai_texts",
+      "%ai_url"
+    ],
+    "424": [
+      "%bi_adaptive_battery_management_enabled",
+      "%bi_adaptive_charging_enabled",
+      "%bi_capacity_percentage",
+      "%bi_capacity",
+      "%bi_charging_policy",
+      "%bi_current_average",
+      "%bi_current_now",
+      "%bi_energy_counter",
+      "%bi_first_usage_date",
+      "%bi_health_string",
+      "%bi_manufacturing_date",
+      "%bi_power_source_string",
+      "%bi_state_of_health",
+      "%bi_status_string",
+      "%bi_time_until_charged",
+      "%bi_battery_low",
+      "%bi_health",
+      "%bi_level",
+      "%bi_power_source",
+      "%bi_present",
+      "%bi_scale",
+      "%bi_status",
+      "%bi_technology",
+      "%bi_temperature",
+      "%bi_voltage"
+    ],
+    "431": [
+      "%as_running_services_after()",
+      "%as_running_services_after_app_names()",
+      "%as_running_services_after_service_names()",
+      "%as_running_services_before()",
+      "%as_running_services_before_app_names()",
+      "%as_running_services_before_service_names()"
+    ],
+    "432": [
+      "%ni_active_full_info_json",
+      "%ni_active_capabilities()",
+      "%ni_active_ip_v4",
+      "%ni_active_ips_v6()",
+      "%ni_active_types()",
+      "%ni_active_wifi_link_speed",
+      "%ni_active_wifi_mac",
+      "%ni_active_wifi_ssid",
+      "%ni_active_wifi_signal_strength",
+      "%ni_other_full_info_json"
+    ],
+    "433": [
+      "%new_state"
+    ],
+    "438": [
+      "%ml_light_brightness()",
+      "%ml_device_id()",
+      "%ml_device_name()",
+      "%ml_light_on()"
+    ],
+    "441": [
+      "%new_state"
+    ],
+    "446": [
+      "%lfp_mimetype()",
+      "%lfp_modification_date()",
+      "%lfp_name()",
+      "%lfp_number_of_files()",
+      "%lfp_full_path()",
+      "%lfp_size()",
+      "%lfp_type()"
+    ],
+    "448": [
+      "%ac_common()",
+      "%ac_comparison_map",
+      "%ac_distinct()",
+      "%ac_exact_match",
+      "%ac_match"
+    ],
+    "462": [
+      "%rae_bearer_token",
+      "%rae_fcm_token",
+      "%rae_remote_device_name()",
+      "%rae_remote_device_token()"
+    ],
+    "464": [
+      "%ce_event_id"
+    ],
+    "465": [
+      "%ce_reminder_id"
+    ],
+    "466": [
+      "%ce_reminder_method()",
+      "%ce_reminder_method_code()",
+      "%ce_reminder_minutes_prior()",
+      "%ce_reminder_id()"
+    ],
+    "467": [
+      "%ce_attendee_id"
+    ],
+    "468": [
+      "%ce_attendee_email()",
+      "%ce_attendee_name()",
+      "%ce_attendee_relationship()",
+      "%ce_attendee_relationship_code()",
+      "%ce_attendee_id()",
+      "%ce_attendee_status()",
+      "%ce_attendee_status_code()",
+      "%ce_attendee_type()",
+      "%ce_attendee_type_code()"
+    ],
+    "470": [
+      "%kb_active_package_name",
+      "%kb_package_name()"
+    ],
+    "473": [
+      "%ss_astronomical_dawn",
+      "%ss_astronomical_dusk",
+      "%ss_civil_dawn",
+      "%ss_civil_dusk",
+      "%ss_custom_morning()",
+      "%ss_custom_evening()",
+      "%ss_day_or_night",
+      "%ss_day_or_night_code",
+      "%ss_nautical_dawn",
+      "%ss_nautical_dusk",
+      "%ss_solar_noon",
+      "%ss_sunlight_duration",
+      "%ss_sunrise",
+      "%ss_sunset"
+    ],
+    "478": [
+      "%wfc_command"
+    ],
+    "488": [
+      "%fj_formatted"
+    ]
+  },
+  "events": {
+    "2080": [
+      "%bt_address",
+      "%bt_alias",
+      "%bt_battery_level",
+      "%bt_paired",
+      "%bt_class",
+      "%bt_class_name",
+      "%bt_connected",
+      "%bt_encrypted",
+      "%bt_major_class",
+      "%bt_major_class_name",
+      "%bt_name",
+      "%bt_signal_strength",
+      "%bt_type"
+    ],
+    "2081": [
+      "%mt_album",
+      "%mt_all_metadata",
+      "%mt_all_metadata_keys()",
+      "%mt_app",
+      "%mt_art",
+      "%mt_artist",
+      "%mt_duration",
+      "%mt_duration_formatted",
+      "%mt_genre",
+      "%mt_number_tracks",
+      "%mt_queue_icons()",
+      "%mt_queue_titles()",
+      "%mt_rating",
+      "%mt_state",
+      "%mt_track",
+      "%mt_track_number",
+      "%mt_year",
+      "%mt_playing"
+    ],
+    "2084": [
+      "%na_day",
+      "%na_month",
+      "%na_package",
+      "%na_time",
+      "%na_time_to_alarm_days",
+      "%na_time_to_alarm_hours",
+      "%na_time_to_alarm_minutes",
+      "%na_time_to_alarm_seconds",
+      "%na_time_ms",
+      "%na_year"
+    ],
+    "2085": [
+      "%lc_text"
+    ],
+    "2088": [
+      "%as_accuracy",
+      "%as_values()",
+      "%as_sensor_type"
+    ],
+    "2089": [
+      "%http_request_body",
+      "%http_request_files()",
+      "%http_request_headers()",
+      "%http_request_ip_address_v4",
+      "%http_request_method",
+      "%http_request_multipart_names()",
+      "%http_request_multipart_types()",
+      "%http_request_multipart_values()",
+      "%http_request_path",
+      "%http_request_port",
+      "%http_request_id"
+    ],
+    "2091": [
+      "%command_parameter",
+      "%command_parameters()",
+      "%command_prefix",
+      "%command_text"
+    ],
+    "2092": [
+      "%pms_add_controls"
+    ],
+    "2093": [
+      "%aa_command"
+    ],
+    "2094": [
+      "%cs_capabilities",
+      "%cs_incoming",
+      "%cs_name",
+      "%cs_number",
+      "%cs_properties"
+    ],
+    "2096": [
+      "%sl_confidence",
+      "%sl_light",
+      "%sl_motion"
+    ],
+    "2097": [
+      "%cl_extras",
+      "%cl_html_text",
+      "%cl_image_uri",
+      "%cl_mimetypes()",
+      "%cl_text",
+      "%cl_uri"
+    ],
+    "2098": [
+      "%asc_running_services()",
+      "%asc_running_services_app_names()",
+      "%asc_running_services_service_names()"
+    ],
+    "2099": [
+      "%uf_failed_attempts"
+    ],
+    "2100": [
+      "%rae_bearer_token",
+      "%rae_fcm_token",
+      "%rae_remote_device_name()",
+      "%rae_remote_device_token()"
+    ],
+    "2101": [
+      "%rs_action",
+      "%rs_all_extras",
+      "%rs_app_name",
+      "%rs_categories()",
+      "%rs_files()",
+      "%rs_flags",
+      "%rs_identifier",
+      "%rs_mime_type",
+      "%rs_package_name",
+      "%rs_share_trigger",
+      "%rs_subject",
+      "%rs_text",
+      "%rs_title"
+    ],
+    "2102": [
+      "%cc_event_ids_added()",
+      "%cc_event_ids_deleted()",
+      "%cc_event_ids_updated()"
+    ],
+    "2103": [
+      "%sa_extras",
+      "%sa_referrer",
+      "%sa_trigger_id",
+      "%sa_trigger_package_name"
+    ],
+    "2104": [
+      "%sv2_element_id",
+      "%sv2_element_path",
+      "%sv2_interaction_type",
+      "%sv2_scene_name",
+      "%sv2_screen_id",
+      "%sv2_element_id",
+      "%sv2_element_value"
+    ],
+    "2105": [
+      "%wf_state"
+    ],
+    "2077": [
+      "%sa_action",
+      "%sa_category",
+      "%sa_extras"
+    ],
+    "2078": [
+      "%app_icon",
+      "%app_name",
+      "%app_package"
+    ]
+  },
+  "states": {}
+}

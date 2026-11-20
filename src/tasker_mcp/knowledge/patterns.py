@@ -136,6 +136,61 @@ AUTOMATION_PATTERNS: dict[str, AutomationPattern] = {
         variables_used=["%WIN", "%LAPP", "%SCREEN"],
         example_description="When YouTube launches: enable auto-rotate, max brightness, max media volume. Restore all when exiting.",
     ),
+    "speak_sms_incoming": AutomationPattern(
+        id="speak_sms_incoming",
+        name="Speak Incoming SMS",
+        description="Read incoming SMS sender name and message body out loud using Text-to-Speech (Say action)",
+        category="Accessibility/Audio",
+        profile_type="event",
+        trigger_codes=[7],  # Text Received event
+        action_codes=[559],  # Say action
+        variables_used=["%SMSRN", "%SMSRF", "%SMSRB"],
+        example_description="When an SMS is received, speak 'New message from %SMSRN: %SMSRB' using Google TTS.",
+    ),
+    "read_time_on_shake": AutomationPattern(
+        id="read_time_on_shake",
+        name="Read Time on Shake",
+        description="Speak current time when the device is shaken",
+        category="Sensors/Audio",
+        profile_type="event",
+        trigger_codes=[3001],  # Shake event
+        action_codes=[559],  # Say action
+        variables_used=["%TIME"],
+        example_description="When shaking the device on Left-Right axis with medium sensitivity, announce current time out loud.",
+    ),
+    "calendar_meeting_dnd": AutomationPattern(
+        id="calendar_meeting_dnd",
+        name="Silence Phone During Calendar Events",
+        description="Automatically enable Do Not Disturb and mute volume during scheduled calendar meetings",
+        category="Calendar/Audio",
+        profile_type="state",
+        trigger_codes=[5],  # Calendar Entry state
+        action_codes=[312, 548],  # DND, Flash
+        variables_used=["%CALTITLE", "%CALDESCR", "%CALLOC"],
+        example_description="When an active meeting is in Google Calendar, enable Do Not Disturb mode and flash meeting title. Restore on exit.",
+    ),
+    "send_telegram_alert": AutomationPattern(
+        id="send_telegram_alert",
+        name="Send Telegram Bot Notification",
+        description="Post a message or alert to a Telegram channel/chat using HTTP Request",
+        category="Network/Communication",
+        profile_type="task",
+        trigger_codes=[],
+        action_codes=[339, 548],  # HTTP Request, Flash
+        variables_used=["%http_data", "%http_response_code"],
+        example_description="Trigger an HTTP POST request to https://api.telegram.org/bot<TOKEN>/sendMessage with chat_id and text.",
+    ),
+    "auto_reply_notification": AutomationPattern(
+        id="auto_reply_notification",
+        name="Auto-Reply to Messaging Notifications",
+        description="Intercept incoming messaging notifications and send an automated reply",
+        category="Communication",
+        profile_type="event",
+        trigger_codes=[461],  # Notification event
+        action_codes=[41, 548],  # Send SMS / Notification Reply
+        variables_used=["%NTITLE", "%NTEXT", "%NPACK"],
+        example_description="When a notification from target app is received while driving, send an auto-reply message.",
+    ),
 }
 # fmt: on
 

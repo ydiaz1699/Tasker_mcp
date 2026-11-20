@@ -9,13 +9,13 @@ tasker-mcp-server/
 ├── src/tasker_mcp/
 │   ├── __init__.py              # Package (v0.1.0)
 │   ├── __main__.py              # Entry point: python -m tasker_mcp
-│   ├── server.py                # FastMCP v3 server (17 tools, 4 resources)
+│   ├── server.py                # FastMCP v3 server (18 tools, 5 resources)
 │   ├── knowledge/               # Enrichment data (descriptions, args, variables, patterns)
 │   │   ├── actions.py           # action descriptions + args (enriches the source)
 │   │   ├── events.py            # event descriptions + args
 │   │   ├── states.py            # state descriptions + args
 │   │   ├── variables.py         # 143 built-in variables (%BATT, %WIFI, etc.)
-│   │   └── patterns.py          # 10 common automation patterns
+│   │   └── patterns.py          # 15 common automation patterns
 │   ├── indexer/                 # Search index (n8n-mcp pattern: SOURCE→LOADER→PARSER→DB)
 │   │   ├── loader.py            # fetch+parse Taskomater/Tasker-XML-Info (authoritative)
 │   │   ├── build_db.py          # merge source+knowledge → SQLite + FTS5 (BM25)
@@ -133,12 +133,12 @@ xml = (
 agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 ```
 
-## Tools (17)
+## Tools (18)
 
 | Tool | Description |
 |------|-------------|
-| `search_tasker_actions` | Search 373 action codes by name/description, filter by category |
-| `search_tasker_events` | Search 82 profile event triggers |
+| `search_tasker_actions` | Search 373 action codes by name/description, filter by category (includes output variables) |
+| `search_tasker_events` | Search 82 profile event triggers (includes output variables) |
 | `search_tasker_states` | Search 50 profile state contexts |
 | `search_tasker_variables` | Search 143 built-in variables (%BATT, %WIFI, etc.) |
 | `generate_task_xml` | Generate .tsk.xml from action list |
@@ -149,9 +149,10 @@ agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 | `extract_translatable_strings` | Extract user-facing strings (dialogs, flashes, TTS, descriptions) safely for translation |
 | `translate_tasker_xml` | Safely apply translated strings and target TTS voice engine to Tasker XML |
 | `compare_tasker_xmls` | Compare original vs translated XML and audit safety (detects broken task names or regressions) |
-| `get_action_info` | Get detailed info for a specific action code |
+| `get_action_info` | Get detailed info for a specific action code including output variables |
+| `get_event_info` | Get detailed info for a specific event code including output variables |
 | `list_action_categories` | List all 18 action categories with counts |
-| `list_common_patterns` | List 10 pre-built automation patterns |
+| `list_common_patterns` | List 15 pre-built automation patterns |
 | `get_pattern_details` | Get full details of a specific pattern |
 | `run_tasker_task` | (Optional, opt-in) Trigger an existing Tasker task live on the phone via `POST /run_task`. Needs `TASKER_HOST`/`TASKER_API_KEY`. |
 
@@ -161,20 +162,21 @@ agent.save_task("My Task", actions_list, "output/my_task.tsk.xml")
 > env vars). Cómo el LLM evita errores de códigos/argumentos y cómo se integra con el
 > MCP externo `dceluis/tasker-mcp`: ver [`docs/integracion-dceluis.md`](docs/integracion-dceluis.md).
 
-## Resources (4)
+## Resources (5)
 
 | URI | Description |
 |-----|-------------|
 | `tasker://reference/action-codes` | Complete 373 action codes by category |
 | `tasker://reference/event-codes` | Complete 82 event codes by category |
 | `tasker://reference/state-codes` | Complete 50 state codes by category |
-| `tasker://reference/variables` | All built-in variables by category |
+| `tasker://reference/variables` | All 143 built-in variables by category |
+| `tasker://rules/golden-rules` | Tasker Native AI Engine Golden Rules for flow design, chaining & XML |
 
 ## Action Categories (18)
 
 App, Flow, Communication, Alert, Network, Variable, File, Media, Display, Audio, Code, System, Scene, Input, Google, Tasker, Plugin, Misc
 
-## Automation Patterns (10)
+## Automation Patterns (15)
 
 | Pattern | Description |
 |---------|-------------|
@@ -188,6 +190,11 @@ App, Flow, Communication, Alert, Network, Variable, File, Media, Display, Audio,
 | `http_request_pattern` | HTTP API calls with response parsing |
 | `geofence_action` | Location-based triggers and actions |
 | `app_launch_action` | Custom settings per app in foreground |
+| `speak_sms_incoming` | Read out loud incoming SMS sender and text with TTS |
+| `read_time_on_shake` | Announce current time out loud on shaking device |
+| `calendar_meeting_dnd` | Automatically enable Do Not Disturb during calendar meetings |
+| `send_telegram_alert` | Post automated alerts to Telegram bot via HTTP Request |
+| `auto_reply_notification` | Intercept messaging notifications and send automated replies |
 
 ## Examples
 
