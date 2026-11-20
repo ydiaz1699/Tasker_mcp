@@ -33,6 +33,13 @@ from tasker_mcp.knowledge.variables import (
     get_variable_by_name,
     search_variables,
 )
+from tasker_mcp.knowledge.companion_apps import (
+    COMPANION_APPS_REGISTRY,
+    CompanionAppInfo,
+    get_companion_app,
+    list_companion_apps,
+    find_plugin_for_need,
+)
 
 __all__ = [
     # Actions
@@ -63,4 +70,10 @@ __all__ = [
     "AUTOMATION_PATTERNS",
     "get_pattern_by_id",
     "search_patterns",
+    # Companion Apps & Plugins
+    "CompanionAppInfo",
+    "COMPANION_APPS_REGISTRY",
+    "get_companion_app",
+    "list_companion_apps",
+    "find_plugin_for_need",
 ]

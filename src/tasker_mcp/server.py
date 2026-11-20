@@ -26,6 +26,10 @@ from tasker_mcp.knowledge import (
     search_patterns,
     search_states,
     search_variables,
+    COMPANION_APPS_REGISTRY,
+    get_companion_app,
+    list_companion_apps,
+    find_plugin_for_need,
 )
 from tasker_mcp.xml_engine import (
     AppContext,
@@ -63,6 +67,12 @@ mcp = FastMCP(
         "In a Project, reusable tasks called via Perform Task (code 130) MUST be named (<nme>), while profile-linked tasks remain anonymous. "
         "5. MULTI-APP TRIGGERS: When triggering on multiple apps, use App Info (code 335) with no arguments "
         "and check %app_package instead of %WIN. "
+        "6. STATE INVERSION: Any State context is inverted by adding <pin>true</pin>. "
+        "7. ANDROID RESTRICTIONS & EXTENSION ECOSYSTEM: When Android OS blocks an action natively "
+        "(e.g. continuous low-power GPS tracking, UI clicking in apps without API, reading third-party notifications, "
+        "toggling Wi-Fi/Bluetooth in Android 10+), NEVER tell the user 'Tasker cannot do this'. Instead, "
+        "use get_recommended_plugin to identify the official João Dias plugin (AutoLocation, AutoInput, "
+        "AutoNotification, AutoTools, Tasker Settings, Shizuku) that overcomes the OS limitation. "
         "ALWAYS look up codes with the search_* tools and validate output with validate_tasker_xml."
     ),
 )
@@ -957,6 +967,73 @@ def resource_golden_rules() -> str:
         ]
     }
     return json.dumps(rules, indent=2, ensure_ascii=False)
+
+
+@mcp.tool
+def get_recommended_plugin(task_or_need: str) -> str:
+    """Find and recommend official João Dias (joaomgcd) AutoApps plugins or companion helpers.
+
+    Use this when Tasker encounters Android OS restrictions (e.g. background GPS battery drain,
+    lack of UI click simulation, intercepting third-party app notifications like WhatsApp,
+    Google Sheets OAuth, or toggling Wi-Fi/Bluetooth on modern Android).
+
+    Args:
+        task_or_need: Description of what you want to automate or the restriction encountered
+                     (e.g., 'rastrear ubicación de mi hermano', 'clic en pantalla de una app',
+                     'responder whatsapp en segundo plano', 'guardar en google sheets',
+                     'alternar wifi en android 14').
+
+    Returns:
+        JSON list of recommended official plugins, why they solve the restriction,
+        and their Play Store / GitHub download URLs.
+    """
+    matches = find_plugin_for_need(task_or_need)
+    if not matches:
+        all_apps = list_companion_apps()
+        return json.dumps(
+            {
+                "message": (
+                    f"No direct specific match for '{task_or_need}', but Tasker has an official "
+                    "ecosystem of plugins and companions by joaomgcd to extend its capabilities."
+                ),
+                "available_ecosystem": [
+                    {
+                        "name": a["name"],
+                        "purpose": a["purpose"],
+                        "url": a["url"],
+                    }
+                    for a in all_apps
+                ],
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    return json.dumps(
+        {
+            "query": task_or_need,
+            "recommended_plugins": matches,
+        },
+        indent=2,
+        ensure_ascii=False,
+    )
+
+
+@mcp.resource("tasker://ecosystem/companion-apps")
+def get_companion_apps_resource() -> str:
+    """Full registry of official João Dias AutoApps plugins, Tasker Settings and Shizuku."""
+    apps = list_companion_apps()
+    return json.dumps(
+        {
+            "title": "João Dias (joaomgcd) Official AutoApps & Companion Ecosystem",
+            "description": "Plugins and system helpers that bypass Android restrictions and extend Tasker.",
+            "total_apps": len(apps),
+            "apps": apps,
+        },
+        indent=2,
+        ensure_ascii=False,
+    )
+
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
